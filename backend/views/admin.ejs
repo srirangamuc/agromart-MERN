@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <header>
+        <h1>Admin Dashboard</h1>
+        <a href="/logout">Logout</a>
+    </header>
+
+    <main>
+        <!-- Purchases Section -->
+        <h2>Purchases</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Items Ordered</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% purchases.forEach(purchase => { %>
+                    <tr>
+                        <td><%= purchase.user.name %></td>
+                        <td><%= purchase.user.email %></td>
+                        <td>
+                            <ul>
+                                <% purchase.items.forEach(item => { %>
+                                    <li><%= item.name %> (Quantity: <%= item.quantity %>)</li>
+                                <% }) %>
+                            </ul>
+                        </td>
+                        <td>$<%= purchase.totalAmount %></td>
+                        <td>
+                            <form action="/admin/update-purchase-status" method="POST">
+                                <input type="hidden" name="purchaseId" value="<%= purchase._id %>">
+                                <select name="status">
+                                    <option value="received" <%= purchase.status === 'received' ? 'selected' : '' %>>Received</option>
+                                    <option value="pending" <%= purchase.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                                    <option value="delivered" <%= purchase.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
+                                </select>
+                                <button type="submit">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+
+        <!-- Customers Section -->
+        <h2>Customers</h2>
+        <h3>Pro Plus Customers</h3>
+        <ul>
+            <% proPlusCustomers.forEach(customer => { %>
+                <li><%= customer.name %> - <%= customer.email %></li>
+            <% }) %>
+        </ul>
+
+        <h3>Pro Customers</h3>
+        <ul>
+            <% proCustomers.forEach(customer => { %>
+                <li><%= customer.name %> - <%= customer.email %></li>
+            <% }) %>
+        </ul>
+
+        <h3>Normal Customers</h3>
+        <ul>
+            <% normalCustomers.forEach(customer => { %>
+                <li><%= customer.name %> - <%= customer.email %></li>
+            <% }) %>
+        </ul>
+
+        <!-- Vendors Section -->
+        <h2>Vendors</h2>
+        <ul>
+            <% vendors.forEach(vendor => { %>
+                <li><%= vendor.name %> - <%= vendor.email %></li>
+            <% }) %>
+        </ul>
+
+        <!-- Customer Analysis Section -->
+        <h2>Customer Analysis</h2>
+        <div class="chart-container">
+            <canvas id="customerPieChart" width="400" height="400"></canvas>
+        </div>
+
+        <!-- Purchases Analysis Section -->
+        <h2>Purchases Analysis</h2>
+        <div class="chart-container">
+            <canvas id="purchasesBarChart" width="400" height="400"></canvas>
+        </div>
+    </main>
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Customer Analysis Pie Chart Script -->
+    <script>
+        fetch('/admin/customer-analysis')
+            .then(response => response.json())
+            .then(data => {
+                const { proPlusCount, proCount, normalCount } = data;
+
+                const ctx = document.getElementById('customerPieChart').getContext('2d');
+                const customerPieChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Pro Plus', 'Pro', 'Normal'],
+                        datasets: [{
+                            data: [proPlusCount, proCount, normalCount],
+                            backgroundColor: ['#ff6f59', '#ffbf46', '#12eaea'],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            datalabels: {
+                                formatter: (value, ctx) => {
+                                    let sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                    let percentage = (value / sum * 100).toFixed(2) + "%";
+                                    return percentage;
+                                },
+                                color: '#fff',
+                                font: {
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching customer data:', error));
+        
+        // Purchases Bar Chart Script
+        fetch('/admin/purchases-analysis')
+            .then(response => response.json())
+            .then(data => {
+                const { itemNames, quantities } = data;
+
+                const ctx = document.getElementById('purchasesBarChart').getContext('2d');
+                const purchasesBarChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: itemNames,
+                        datasets: [{
+                            label: 'Quantities Purchased',
+                            data: quantities,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching purchases data:', error));
+    </script>
+</body>
+</html>
