@@ -112,6 +112,7 @@ class CustomerController {
     async getCart(req, res) {
         try {
             const userId = req.session.userId;
+            console.log("ENtered")
     
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
@@ -125,7 +126,7 @@ class CustomerController {
             }
     
             // Calculate total cart value
-            const cartItems = userWithCart.cart.map(cartItem => ({
+            const cartItems = userWithCart.cart.filter(cartItem=>cartItem.item).map(cartItem => ({
                 ...cartItem.item.toObject(), // Convert item to plain object
                 cartQuantity: cartItem.quantity, // Include quantity in the cart item
                 totalPrice: cartItem.item.pricePerKg * cartItem.quantity * 1.5 // Calculate total price for each cart item
