@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ShoppingCart, Info } from 'lucide-react';
+import { ShoppingCart, Info, Search } from 'lucide-react';
 import { addToCart } from '../../redux/productSlice';
 import { productsService } from '../../services/productServices';
 
@@ -11,6 +11,27 @@ const ProductsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [quantities, setQuantities] = useState({});
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const slides = [
+    {
+      image: "./summer-vegetables.jpg",
+      title: "Summer Special Offers",
+      description: "Get up to 50% off on fresh fruits"
+    },
+    {
+      image: "./summer-vegetables.jpg",
+      title: "New Organic Collection",
+      description: "Explore our new range of organic products"
+    },
+    {
+      image: "./summer-vegetables.jpg",
+      title: "Free Delivery",
+      description: "On orders above $50"
+    }
+  ];
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -18,10 +39,17 @@ const ProductsPage = () => {
         const data = await productsService.fetchProducts();
         if (Array.isArray(data.items)) {
           setProducts(data.items);
+          setFilteredProducts(data.items);
+          const initialQuantities = {};
+          data.items.forEach((product) => {
+            initialQuantities[product._id] = 1;
+          });
+          setQuantities(initialQuantities);
         } else {
           throw new Error('Fetched data is not an array');
         }
       } catch (error) {
+        console.error('Error fetching products:', error);
         setError(error.message);
       } finally {
         setLoading(false);
@@ -31,9 +59,33 @@ const ProductsPage = () => {
     fetchProducts();
   }, []);
 
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    (() => {
+      let timeoutId;
+      return (searchValue) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          const filtered = products.filter((product) =>
+            product.name.toLowerCase().includes(searchValue.toLowerCase())
+          );
+          setFilteredProducts(filtered);
+        }, 400); 
+      };
+    })(),
+    [products]
+  );
+
+  // Handle search input changes
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    debouncedSearch(value);
+  };
+
   const handleAddToCart = async (itemId) => {
     try {
-      const quantity = 1;
+      const quantity = 0.5 * quantities[itemId];
       await productsService.addToCart(itemId, quantity);
       dispatch(addToCart(itemId, quantity));
     } catch (error) {
@@ -42,13 +94,44 @@ const ProductsPage = () => {
     }
   };
 
-  const filteredProducts = products.filter(product => 
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleQuantityChange = (itemId, value) => {
+    const product = products.find((p) => p._id === itemId);
+    if (!product) return;
+
+    if (value === '' || isNaN(value)) {
+      setQuantities((prev) => ({
+        ...prev,
+        [itemId]: value,
+      }));
+      return;
+    }
+
+    const numericValue = parseInt(value, 10);
+
+    if (numericValue > product.quantity) {
+      alert(`Error: Only ${product.quantity} kg available for ${product.name}.`);
+      return;
+    }
+
+    if (numericValue >= 1) {
+      setQuantities((prev) => ({
+        ...prev,
+        [itemId]: numericValue,
+      }));
+    }
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex justify-center items-center bg-gray-100">
+      <div className="flex justify-center items-center h-screen bg-gray-50">
         <div className="animate-pulse text-2xl font-semibold text-gray-600">
           Loading products...
         </div>
@@ -58,7 +141,7 @@ const ProductsPage = () => {
 
   if (error) {
     return (
-      <div className="fixed inset-0 flex justify-center items-center bg-red-50">
+      <div className="flex justify-center items-center h-screen bg-red-50">
         <div className="text-red-600 text-2xl font-semibold flex items-center space-x-2">
           <Info className="w-8 h-8" />
           <span>Error: {error}</span>
@@ -68,80 +151,157 @@ const ProductsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Full-width Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-40">
-        <div className="max-w-full px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-800">Our Products</h1>
-          <div className="flex items-center space-x-4">
-            {/* Search Input */}
-            <input 
-              type="text"
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-300"
+    <>
+      {/* Hero Slider */}
+      <div className="relative w-[80%] h-[400px] md:h-[500px] overflow-hidden mx-auto px-4 mt-6 mb-8 rounded-2xl bg-transperant">
+        <div 
+          className="flex gap-5 h-full transition-transform duration-500 ease-in-out"
+          style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+        >
+          {slides.map((slide, index) => (
+            <div key={index} className="w-full h-full flex-shrink-0 relative">
+              <img
+                src={slide.image}
+                alt={slide.title}
+                className="w-full h-full rounded-2xl"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/20 rounded-2xl flex flex-col gap-3 justify-end items-center text-white pb-16">
+                <h2 className="text-3xl md:text-5xl font-bold mb-3 text-center px-4">{slide.title}</h2>
+                <p className="text-lg md:text-xl text-center px-4 max-w-2xl">{slide.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Slider Controls */}
+        <button
+          onClick={prevSlide}
+          className="absolute left-8 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white transition-colors"
+          aria-label="Previous slide"
+        >
+          <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-8 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white transition-colors"
+          aria-label="Next slide"
+        >
+          <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+
+        {/* Slide Indicators */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-3">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`w-3 h-3 rounded-full transition-all transform ${
+                currentSlide === index 
+                  ? 'bg-white scale-100' 
+                  : 'bg-white/50 scale-90 hover:scale-95 hover:bg-white/70'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
             />
+          ))}
+        </div>
+      </div>
+
+      <div className="h-full flex flex-col bg-transperant">
+        {/* Search Header */}
+        <div className="bg-transperant p-4">
+          <div className="w-full mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h1 className="text-2xl font-bold text-gray-800">Veggies</h1>
+            <div className="relative w-full sm:w-auto">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="w-full sm:w-80 pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none"
+              />
+            </div>
           </div>
         </div>
-      </header>
 
-      {/* Products Grid */}
-      <main className="px-4 sm:px-6 lg:px-8 py-8">
-        {filteredProducts.length === 0 ? (
-          <div className="text-center text-gray-500 text-xl py-16">
-            No products found
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-            {filteredProducts.map((product) => (
-              <div 
-                key={product._id}
-                className="bg-white w-300 h-300 rounded-2xl shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2"
-              >
-                <div className="relative">
-                  <img
-                    src={`src/assets/images/resized_images/${product.name}.png`}
-                    alt={product.name}
-                    className="w-200 h-64 object-cover"
-                  />
-                  {product.quantity <= 0 && (
-                    <div className="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                      Sold Out
-                    </div>
-                  )}
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <h2 className="text-2xl font-semibold text-gray-800">{product.name}</h2>
-                    <span className="text-xl font-bold text-green-600">
-                      ₹{(product.pricePerKg)*1.5}/kg
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-500">
-                      {product.quantity} kg available
-                    </span>
-                    <button
-                      onClick={() => handleAddToCart(product._id)}
-                      disabled={product.quantity <= 0}
-                      className={`
-                        flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300
-                        ${product.quantity > 0 
-                          ? 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95' 
-                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
-                      `}
-                    >
-                      <ShoppingCart className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
+        {/* Products Grid */}
+        <div className="flex-1 overflow-auto p-4 sm:p-6">
+          {filteredProducts.length === 0 ? (
+            <div className="flex justify-center items-center h-full">
+              <div className="text-center text-gray-500 text-xl">
+                No products found
               </div>
-            ))}
-          </div>
-        )}
-      </main>
-    </div>
+            </div>
+          ) : (
+            <div className="w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredProducts.map((product) => (
+                <div
+                  key={product._id}
+                  className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="relative aspect-w-4 aspect-h-3">
+                    <img
+                      src={`src/assets/images/resized_images/${product.name}.png`}
+                      alt={product.name}
+                      className="w-40 h-25 ml-[25%]"
+                    />
+                    {product.quantity <= 0 && (
+                      <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                        Sold Out
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <h2 className="text-lg font-semibold text-gray-800">
+                        {product.name}
+                      </h2>
+                      <span className="text-lg font-bold text-emerald-600">
+                        ₹{(product.pricePerKg) * 1.5}/kg
+                      </span>
+                    </div>
+
+                    <div className="text-sm text-gray-500 mb-4">
+                      {product.quantity} kg available
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="text"
+                        value={quantities[product._id]}
+                        onChange={(e) => handleQuantityChange(product._id, e.target.value)}
+                        className="w-20 text-center px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                      <button
+                        onClick={() => handleAddToCart(product._id)}
+                        disabled={product.quantity <= 0}
+                        className={`
+                          flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg
+                          ${
+                            product.quantity > 0
+                              ? 'bg-emerald-500 text-white hover:bg-emerald-600 active:scale-95'
+                              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          }
+                          transition-all duration-300
+                        `}
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        <span>Add to Cart</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 };
 

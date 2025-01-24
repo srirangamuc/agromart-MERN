@@ -81,7 +81,7 @@ function Cart() {
                     {cartItems.length === 0 ? (
                         <div className="text-center py-16 text-gray-500">
                             <ShoppingCart className="mx-auto w-16 h-16 mb-4 text-gray-300" />
-                            <p className="text-2xl">Your cart is empty</p>
+                            <p className="text-2xl">It seems your cart is empty</p>
                         </div>
                     ) : (
                         <div className="divide-y divide-gray-100">

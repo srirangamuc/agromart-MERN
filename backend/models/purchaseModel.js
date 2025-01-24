@@ -46,6 +46,7 @@ const purchaseSchema = new mongoose.Schema({
         country:{type:String,required:true},
         zipCode: { type: String, required: true }
     }
+    
 });
 
 module.exports = mongoose.model('Purchase', purchaseSchema);

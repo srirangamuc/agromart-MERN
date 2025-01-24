@@ -32,8 +32,8 @@ class VendorController {
                 return res.status(400).json({ error: 'Product is not allowed. Please select from the list of allowed fruits and vegetables.' });
             }
 
+            // Add or update the product in the Item model
             const existingProduct = await Item.findOne({ name });
-
             if (existingProduct) {
                 const newTotalPrice = (existingProduct.pricePerKg + pricePerKg) / 2;
                 existingProduct.pricePerKg = newTotalPrice;
@@ -43,9 +43,17 @@ class VendorController {
                 const newItem = new Item({ name, quantity, pricePerKg });
                 await newItem.save();
             }
-
-            const profit = quantity * pricePerKg;
-            const vendorItem = new Vendor({ vendor: vendorId, itemName: name, quantity, pricePerKg, profit });
+ 
+            // Add the product to the Vendor model
+            const vendorItem = new Vendor({
+                vendor: vendorId,
+                itemName: name,
+                quantity,
+                pricePerKg,
+                quantitySold: 0, // Initially, nothing is sold
+                profit: 0, // Profit is zero initially
+                timestamp: Date.now(), // Current timestamp
+            });
             await vendorItem.save();
 
             res.status(200).json({ message: 'Product added successfully' });
@@ -64,8 +72,8 @@ class VendorController {
                 return res.status(400).json({ error: 'Vendor must be logged in' });
             }
 
-            // Fetch products for the specific vendor
-            const products = await Vendor.find({ vendor: vendorId });
+            // Fetch products for the specific vendor, sorted by timestamp
+            const products = await Vendor.find({ vendor: vendorId }).sort({ timestamp: 1 });
 
             res.status(200).json({ products });
         } catch (error) {
@@ -109,8 +117,16 @@ class VendorController {
                 return res.status(401).json({ error: 'User not authenticated' });
             }
 
-            const { username, password } = req.body;
-
+            const { username, password ,email,hno, street,
+                city,
+                state,
+                country,
+                zipCode} = req.body;
+            console.log( username, password ,email,hno, street,
+                city,
+                state,
+                country,
+                zipCode)
             const user = await User.findById(userId);
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
@@ -126,6 +142,30 @@ class VendorController {
                 const hashedPassword = await bcrypt.hash(password, saltRounds);
                 user.password = hashedPassword;
             }
+            if(email){
+                user.email=email
+            }
+            
+            if(hno){
+                user.address.hno=hno
+
+            }
+            if(city){
+                user.address.city=city
+            }
+            if(state){
+            user.address.state=state}
+            if(street){
+                user.address.street=street
+            }
+            if(country){
+                user.address.country=country
+
+            }
+            
+            if(zipCode){
+                user.address.zipCode=zipCode
+            }
 
             await user.save();
             res.status(200).json({ message: 'Profile updated successfully' });
@@ -134,7 +174,32 @@ class VendorController {
             res.status(500).json({ error: "Server error" });
         }
     }
-
+    async getProfile(req, res) {
+        try {
+          const userId = req.session.userId; // Get the userId from the session
+      
+          if (!userId) {
+            return res.status(401).json({ error: 'User not authenticated' }); // Handle unauthenticated users
+          }
+      
+          // Find the user by userId in the database
+          const user = await User.findById(userId).select('-password'); // Don't include the password in the response
+      
+          if (!user) {
+            return res.status(404).json({ error: 'User not found' }); // Handle case where user does not exist
+          }
+      
+          // Return the user profile information
+          res.json({
+            name: user.name,
+            email: user.email,
+            address: user.address,
+          });
+        } catch (error) {
+          console.error("Get profile error:", error);
+          return res.status(500).json({ error: 'Something went wrong. Please try again.' }); // General error handling
+        }
+      }
     // Helper function to capitalize the first letter of each word
     capitalizeFirstLetter(string) {
         return string.replace(/\b\w/g, char => char.toUpperCase());

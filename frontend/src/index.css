@@ -4,3 +4,6 @@
 body {
     font-family: 'Raleway', sans-serif;
 }
+::-webkit-scrollbar{
+    display: none;
+}

@@ -75,6 +75,7 @@ class vendorService {
     // Update the vendor profile
     static async updateProfile(profileData) {
         try {
+            console.log(profileData)
             const response = await fetch(`${BASE_URL}/`, {
                 method: 'POST',
                 credentials: 'include',
@@ -95,12 +96,29 @@ class vendorService {
             throw error;
         }
     }
-
+    static async fetchProfile() {
+        try {
+          const response = await fetch(`${BASE_URL}/profile`, {
+            method: 'GET',
+            credentials: 'include',
+          });
+          console.log(response)
+    
+          if (!response.ok) {
+            throw new Error('Failed to fetch user profile');
+          }
+    
+          return await response.json(); // Return profile data
+        } catch (error) {
+          console.error('Error fetching profile:', error.message);
+          throw new Error('Failed to fetch profile. Please try again.');
+        }
+    }
     // Fetch profit data for the vendor
     static async getProfitData() {
         try {
             const response = await fetch(`${BASE_URL}/profit-data`, {
-                method: 'GET',
+                method: 'GET',   
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',

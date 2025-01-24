@@ -12,7 +12,7 @@ router.get('/products', isAuthenticated, (req, res) => vendorController.getProdu
 
 // Route to fetch the vendor dashboard
 router.get('/dashboard', isAuthenticated, (req, res) => vendorController.getVendorDashboard(req, res));
-
+router.get('/profile',  isAuthenticated, (req, res) => vendorController.getProfile(req, res));
 // Route to render the vendor page (including the profile section)
 router.get('/', isAuthenticated, (req, res) => vendorController.getVendorDashboard(req, res));
 router.post('/', isAuthenticated, (req, res) => vendorController.updateProfile(req, res)); // Handle profile updates

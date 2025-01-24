@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useDispatch } from 'react-redux';
 import { loginUser, registerUser } from '../services/authServices'; 
@@ -10,6 +10,7 @@ import {
   ArrowRight, 
   X 
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const AuthPage = ({ onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -19,11 +20,72 @@ const AuthPage = ({ onClose }) => {
   const dispatch = useDispatch();
 
   const handleLogin = () => {
-    loginUser(email, password, dispatch); 
+    if (!email || !password) {
+      toast.error("Email and password are required");
+      return;
+    }
+  
+    loginUser(email, password, dispatch)
+      .then(() => {
+          toast.success("Login successful");
+          // Additional logic for successful login
+      })
+      .catch((error) => {
+        if (error.response) {
+          switch (error.response.status) {
+            case 400:
+              toast.error("Email and password are required");
+              break;
+            case 401:
+              toast.error("Invalid email or password");
+              break;
+            case 500:
+              toast.error("Server error. Please try again later");
+              break;
+            default:
+              toast.error("Error occurred during login");
+          }
+        } else {
+          toast.error("Network error. Please check your connection");
+        }
+        console.error("Login error:", error);
+      });
   };
-
+  
   const handleSignup = () => {
-    registerUser(name, email, password, 'customer', dispatch); 
+    if (!name || !email || !password) {
+      toast.error("All fields are required");
+      return;
+    }
+  
+    registerUser(name, email, password, 'customer', dispatch)
+      .then((response) => {
+        if (response.user) {
+          toast.success("Signup successful!");
+          setIsLogin(true);
+          // The controller will handle the redirect
+        }
+      })
+      .catch((error) => {
+        if (error.response) {
+          switch (error.response.status) {
+            case 400:
+              toast.error("All fields are required");
+              break;
+            case 409:
+              toast.error("Email already exists");
+              break;
+            case 500:
+              toast.error("Server error. Please try again later");
+              break;
+            default:
+              toast.error("Signup failed. Please try again");
+          }
+        } else {
+          toast.error("Network error. Please check your connection");
+        }
+        console.error("Signup error:", error);
+      });
   };
 
   return (
