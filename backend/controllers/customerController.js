@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const STRIPE_SECRET_KEY = 'sk_test_51Q1BEGDvKfDjvcpCsEqOVgaKLyoDU660JD41lqYzQU3G9KUsvFmcDiJ72dLMexorHUr4rC91KPBmMeiJxDZlpgru00gDvBILze';
 const stripe = require('stripe')(STRIPE_SECRET_KEY);
 const Vendor = require('../models/vendorModel')
+const Distributor = require("../models/distributorModel")
 class CustomerController {
     // Get Customer Dashboard
     async getCustomerDashBoard(req, res) {
@@ -45,7 +46,6 @@ class CustomerController {
             return res.status(500).json({ error: 'Something went wrong during checkout. Please try again.' });
         }
     }
-
     async addToCart(req, res) {
         try {
             const { itemId, quantity } = req.body; // Now accepting quantity directly from request
@@ -101,8 +101,6 @@ class CustomerController {
             return res.status(500).json({ error: 'Something went wrong. Please try again.' });
         }
     }
-    
-
     async deleteFromCart(req, res) {
         try {
             const { itemId } = req.body;
@@ -172,6 +170,23 @@ class CustomerController {
             if (!user) {
                 return res.status(400).json({ error: 'User not found' });
             }
+
+            const { address } = user;
+            if (!address || !address.hno || !address.street || !address.city || 
+                !address.state || !address.country || !address.zipCode) {
+                return res.status(400).json({ error: 'Please provide a complete address before checkout.' });
+            }
+
+            // Find the distributor based on the city
+            const distributor = await User.findOne({
+                role: 'distributor',
+                'address.city': address.city
+            });
+
+            if (!distributor) {
+                return res.status(400).json({ error: 'No distributor available in your city' });
+            }
+
 
             const itemsToPurchase = user.cart.filter(cartItem => cartItem.item);
             if (itemsToPurchase.length === 0) {
@@ -259,7 +274,10 @@ class CustomerController {
                     purchaseDate: new Date(),
                     status: 'received',
                     totalAmount: finalAmount,
-                    address: user.address
+                    address: user.address,
+                    deliveryStatus:'assigned',
+                    assignedDistributor:distributor._id
+
                 });
                 await purchase.save();
 
@@ -291,13 +309,69 @@ class CustomerController {
                     }
                 }
 
+                distributor.totalDeliveries += 1;
+                await distributor.save();
+
                 user.cart = [];
                 await user.save();
                 return res.json({ success: 'Order placed successfully' });
             } else if (paymentMethod === 'stripe') {
-                // Similar implementation for Stripe payment...
-                // [Previous Stripe implementation remains the same]
-                // After successful payment, implement the same vendor quantity and profit updates as above
+                try {
+                    const session = await stripe.checkout.sessions.create({
+                        payment_method_types: ['card'],
+                        line_items: [{
+                            price_data: {
+                                currency: 'inr',
+                                product_data: { name: 'Total Purchase' },
+                                unit_amount: Math.round(finalAmount * 100),
+                            },
+                            quantity: 1,
+                        }],
+                        mode: 'payment',
+                        success_url: `http://localhost:5173/success`,
+                        cancel_url: `http://localhost:5173/cancel`,
+
+                    });
+
+                    res.json({ sessionUrl: session.url });
+                    const purchase = new Purchase({
+                        user: user._id,
+                        items: itemsToPurchase.map(cartItem => ({
+                            item: cartItem.item._id,
+                            name: cartItem.item.name,
+                            quantity: cartItem.quantity,
+                            pricePerKg: cartItem.item.pricePerKg
+                        })),
+                        purchaseDate: new Date(),
+                        status: 'received',
+                        totalAmount: finalAmount,
+                        address: user.address,
+                        deliveryStatus:'assigned',
+                        assignedDistributor: distributor._id
+                    });
+                    await purchase.save();
+
+                    for (const cartItem of itemsToPurchase) {
+                        const item = await Item.findById(cartItem.item._id);
+                        if (item) {
+                            item.quantity -= cartItem.quantity;
+                            if (item.quantity <= 0) {
+                                await Item.findByIdAndDelete(item._id);
+                            } else {
+                                await item.save();
+                            }
+                        }
+                    }
+
+                    distributor.totalDeliveries += 1;
+                    await distributor.save();
+
+                    user.cart = [];
+                    await user.save();
+                } catch (error) {
+                    console.error("Checkout error:", error);
+                    return res.status(500).json({ error: 'Something went wrong during checkout. Please try again.' });
+                }
             }
         } catch (error) {
             console.error("Checkout error:", error);

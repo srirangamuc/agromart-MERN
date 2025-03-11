@@ -1,4 +1,4 @@
-import { useState } from 'react';
+/* eslint-disable no-unused-vars */
 import { useDispatch, useSelector } from 'react-redux';
 import { Home, ShoppingCart, CreditCard, User, Package, LogOut } from 'lucide-react';
 import { setActiveSection } from '../../redux/sectionSlice';
@@ -64,7 +64,7 @@ const CustomerDashboard = () => {
 
 
   return (
-    <div className="bg-gradient-to-br from-green-200 via-green-100 to-white min-h-screen w-full">
+    <div className="bg-gradient-to-tl from-gray-200  via-green-100  to-gray-200 min-h-screen w-full">
       {/* Navbar */}
       <nav className="bg-transperant pt-7">
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">

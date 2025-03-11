@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   BarChart2, 
   ShoppingBag, 
@@ -13,15 +13,6 @@ import PurchaseList from '../../components/admin/PurchaseList';
 import CustomerAnalysis from '../../components/admin/CustomerAnalysis';
 import PurchasesAnalysis from '../../components/admin/PurchasesAnalysis';
 
-const BentoCard = ({ title, icon: Icon, children, className = '' }) => (
-  <div className={`bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 p-6 flex flex-col ${className}`}>
-    <div className="flex items-center mb-4">
-      <Icon className="mr-3 text-blue-600 w-6 h-6" />
-      <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
-    </div>
-    {children}
-  </div>
-);
 
 const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);

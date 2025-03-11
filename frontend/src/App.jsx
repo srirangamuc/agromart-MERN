@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import LandingPage from "./pages/LandingPage";
@@ -6,6 +6,7 @@ import AuthPage from "./pages/AuthPage";
 import CustomerDashboard from "./pages/dashboards/CustomerDashboard";
 import AdminDashboard from "./pages/dashboards/AdminDashboard";
 import VendorDashboard from "./pages/dashboards/VendorDashboard";
+import DistributorDashboard from './pages/dashboards/DistributorDashboard';
 import { AnimatePresence } from "framer-motion"; // For modal animations
 import { loginSuccess, logout } from "./redux/authSlice"; // Assuming your slice is in redux folder
 import Success from './components/Customer/Success'
@@ -46,6 +47,7 @@ const App = () => {
     if (role === "customer") return "/dashboard";
     if (role === "admin") return "/admin-dashboard";
     if (role === "vendor") return "/vendor-dashboard";
+    if (role === "distributor") return '/distributor-dashboard'
     return "/auth";
   };
 
@@ -91,6 +93,19 @@ const App = () => {
           }
         />
 
+        {/* Distributor Dashboard Route */}
+        <Route
+          path="/distributor-dashboard"
+          element={
+            isAuthenticated && user?.role === "distributor" ? (
+              <>
+                <DistributorDashboard />
+              </>
+            ) : (
+              <Navigate to="/auth" replace />
+            )
+          }
+        />
         {/* Admin Dashboard Route */}
         <Route
           path="/admin-dashboard"

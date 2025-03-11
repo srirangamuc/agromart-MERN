@@ -2,23 +2,22 @@ const express = require('express');
 const router = express.Router();
 const vendorController = require('../controllers/vendorController');
 const Vendor = require('../models/vendorModel');
-const isAuthenticated = require('../middleware/authMiddleware');
 
 // Route to add a product
-router.post('/add-product', isAuthenticated, (req, res) => vendorController.addProduct(req, res));
+router.post('/add-product', (req, res) => vendorController.addProduct(req, res));
 
 // Route to fetch products for the vendor
-router.get('/products', isAuthenticated, (req, res) => vendorController.getProducts(req, res));
+router.get('/products', (req, res) => vendorController.getProducts(req, res));
 
 // Route to fetch the vendor dashboard
-router.get('/dashboard', isAuthenticated, (req, res) => vendorController.getVendorDashboard(req, res));
-router.get('/profile',  isAuthenticated, (req, res) => vendorController.getProfile(req, res));
+router.get('/dashboard', (req, res) => vendorController.getVendorDashboard(req, res));
+router.get('/profile',  (req, res) => vendorController.getProfile(req, res));
 // Route to render the vendor page (including the profile section)
-router.get('/', isAuthenticated, (req, res) => vendorController.getVendorDashboard(req, res));
-router.post('/', isAuthenticated, (req, res) => vendorController.updateProfile(req, res)); // Handle profile updates
+router.get('/', (req, res) => vendorController.getVendorDashboard(req, res));
+router.post('/', (req, res) => vendorController.updateProfile(req, res)); // Handle profile updates
 
 // Route to fetch profit data
-router.get('/profit-data', isAuthenticated, async (req, res) => {
+router.get('/profit-data', async (req, res) => {
     try {
         const vendorId = req.session.userId;
 

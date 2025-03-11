@@ -1,5 +1,5 @@
 // src/services/userService.js
-const BASE_URL = 'http://localhost:5000/customer'; // Update with your API URL
+const BASE_URL = 'http://localhost:5000/api/customer'; // Update with your API URL
 
 export const userService = {
   // Fetch user profile data

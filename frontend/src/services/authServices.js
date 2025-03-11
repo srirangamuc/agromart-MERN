@@ -6,11 +6,10 @@ const API_URL = "http://localhost:5000";
 // Login function
 export const loginUser = async (email, password, dispatch) => {
     try {
-        const response = await fetch(`${API_URL}/login`, {
+        const response = await fetch(`${API_URL}/api/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify({ email, password }),
             credentials: 'include', // Ensure this is set to send cookies
@@ -34,11 +33,10 @@ export const loginUser = async (email, password, dispatch) => {
 // Register function
 export const registerUser = async (name, email, password, role, dispatch) => {
     try {
-        const response = await fetch(`${API_URL}/signup`, {
+        const response = await fetch(`${API_URL}/api/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify({ name, email, password, role }),
         });

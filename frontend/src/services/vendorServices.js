@@ -1,5 +1,5 @@
 // services/vendorService.js
-const BASE_URL = "http://localhost:5000/vendor"; // Base URL for vendor endpoints
+const BASE_URL = "http://localhost:5000/api/vendor"; // Base URL for vendor endpoints
 
 class vendorService {
     // Add a new product

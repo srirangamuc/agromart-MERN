@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
     // There are three roles for our project
     role: {
         type: String,
-        enum: ['admin', 'customer', 'vendor'],
+        enum: ['admin', 'customer', 'vendor','distributor'],
         default: 'customer'
     },
     cart:[{

@@ -12,11 +12,13 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
+// eslint-disable-next-line react/prop-types
 const AuthPage = ({ onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [role, setRole] = useState('customer'); // Default role
   const dispatch = useDispatch();
 
   const handleLogin = () => {
@@ -28,7 +30,6 @@ const AuthPage = ({ onClose }) => {
     loginUser(email, password, dispatch)
       .then(() => {
           toast.success("Login successful");
-          // Additional logic for successful login
       })
       .catch((error) => {
         if (error.response) {
@@ -58,12 +59,11 @@ const AuthPage = ({ onClose }) => {
       return;
     }
   
-    registerUser(name, email, password, 'customer', dispatch)
+    registerUser(name, email, password, role, dispatch)
       .then((response) => {
         if (response.user) {
           toast.success("Signup successful!");
           setIsLogin(true);
-          // The controller will handle the redirect
         }
       })
       .catch((error) => {
@@ -124,16 +124,33 @@ const AuthPage = ({ onClose }) => {
           {/* Form */}
           <div className="space-y-4">
             {!isLogin && (
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Full Name"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
-                />
+              <>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Full Name"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+                  />
+                </div>
+
+                {/* Role Selection */}
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <select
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-gray-500"
+                  >
+                    <option value="" disabled hidden>Select Role</option>
+                    <option value="customer">Customer</option>
+                    <option value="vendor">Vendor</option>
+                    <option value="distributor">Distributor</option>
+                  </select>
               </div>
+              </>
             )}
 
             <div className="relative">

@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000/customer'; // Update with your API URL
+const BASE_URL = 'http://localhost:5000/api/customer'; // Update with your API URL
 
 export const productsService = {
   // Fetching the list of products

@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000/admin'; // Base route for admin endpoints
+const BASE_URL = 'http://localhost:5000/api/admin'; // Base route for admin endpoints
 
 export const adminService = {
   async getDashboardData() {

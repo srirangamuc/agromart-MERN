@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000/customer'; // Local development URL
+const BASE_URL = 'http://localhost:5000/api/customer'; // Local development URL
 
 export const cartServices = {
   // Fetch cart items for the user
@@ -48,25 +48,27 @@ export const cartServices = {
   // Checkout process with selected payment method
   async checkout(paymentMethod) {
     try {
-      console.log("calling success")
+      console.log("Calling checkout API with:", paymentMethod);
       const response = await fetch(`${BASE_URL}/checkout`, {
         method: 'POST',
-        credentials: 'include', // Ensure cookies are sent with request
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ paymentMethod }),
       });
-      console.log(response)
-
+  
+      const responseBody = await response.text(); // Read response body
+      console.log("Checkout Response:", response.status, responseBody);
+  
       if (!response.ok) {
-        throw new Error(`Checkout failed: ${response.statusText}`);
+        throw new Error(`Checkout failed: ${response.statusText}, Response: ${responseBody}`);
       }
-
-      const data = await response.json();
-      return data; // Return the response data after successful checkout
+  
+      return JSON.parse(responseBody);
     } catch (error) {
+      console.error("Checkout Error:", error);
       throw new Error('Checkout failed. Please try again.');
     }
-  },
+  }  
 };

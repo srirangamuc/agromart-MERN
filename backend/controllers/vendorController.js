@@ -17,6 +17,7 @@ class VendorController {
         try {
             let { name, quantity, pricePerKg } = req.body;
             const vendorId = req.session.userId;
+            console.log(vendorId)
 
             // Convert quantity and pricePerKg to numbers
             quantity = parseInt(quantity, 10);
@@ -67,7 +68,6 @@ class VendorController {
     async getProducts(req, res) {
         try {
             const vendorId = req.session.userId;
-
             if (!vendorId) {
                 return res.status(400).json({ error: 'Vendor must be logged in' });
             }
