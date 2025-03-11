@@ -76,39 +76,44 @@ exports.updateDistributorInfo = async (req, res) => {
     try {
         const { contactPhone, address } = req.body;
 
-        // Find the distributor in the User model
-        const distributor = await User.findById(distributorId);
-        if (!distributor || distributor.role !== "distributor") {
+        // Update the User model for the address
+        const user = await User.findById(distributorId);
+        if (!user || user.role !== "distributor") {
             return res.status(404).json({ message: "Distributor not found or unauthorized." });
         }
 
-        // Update distributor information
-        if (contactPhone) distributor.contactPhone = contactPhone;
-        
-        // Store the complete address object
         if (address) {
-            distributor.address = {
-                hno: address.hno,
-                street: address.street,
-                city: address.city,
-                state: address.state,
-                country: address.country,
-                zipCode: address.zipCode
+            user.address = {
+                hno: address.hno || user.address.hno,
+                street: address.street || user.address.street,
+                city: address.city || user.address.city,
+                state: address.state || user.address.state,
+                country: address.country || user.address.country,
+                zipCode: address.zipCode || user.address.zipCode
             };
         }
+        await user.save();
 
+        // Update the Distributor model for the contactPhone
+        const distributor = await Distributor.findOne({ user: distributorId });
+        if (!distributor) {
+            return res.status(404).json({ message: "Distributor details not found." });
+        }
+
+        if (contactPhone) distributor.contactPhone = contactPhone;
         await distributor.save();
 
         res.status(200).json({
             message: "Distributor information updated successfully.",
             contactPhone: distributor.contactPhone,
-            address: distributor.address
+            address: user.address
         });
     } catch (error) {
         console.error("Error updating distributor info:", error);
         res.status(500).json({ message: "Server error." });
     }
 };
+
 
 exports.getAssignedPurchases = async (req, res) => {
     const distributorId = req.session.userId;
@@ -138,6 +143,7 @@ exports.updateDeliveryStatus = async (req, res) => {
     }
 
     try {
+        // Find the purchase assigned to the distributor
         const purchase = await Purchase.findOne({
             _id: purchaseId,
             assignedDistributor: distributorId
@@ -147,6 +153,7 @@ exports.updateDeliveryStatus = async (req, res) => {
             return res.status(404).json({ message: "Purchase not found or unauthorized." });
         }
 
+        // Validate status update
         if (!["assigned", "out for delivery", "delivered"].includes(status)) {
             return res.status(400).json({ message: "Invalid status update." });
         }
@@ -154,6 +161,12 @@ exports.updateDeliveryStatus = async (req, res) => {
         purchase.deliveryStatus = status;
         if (status === "delivered") {
             purchase.status = "completed";
+
+            // Update distributor's total deliveries
+            await Distributor.findOneAndUpdate(
+                { user: distributorId },
+                { $inc: { totalDeliveries: 1 } } // Increment total deliveries by 1
+            );
         }
 
         await purchase.save();
@@ -164,6 +177,7 @@ exports.updateDeliveryStatus = async (req, res) => {
         res.status(500).json({ message: "Server error." });
     }
 };
+
 
 exports.rateDistributor = async (req, res) => {
     console.log("Rating system entered");
@@ -216,5 +230,35 @@ exports.rateDistributor = async (req, res) => {
     } catch (error) {
         console.error("Error in rating distributor:", error);
         res.status(500).json({ message: "Internal server error." });
+    }
+};
+exports.getDistributorDetails = async (req, res) => {
+    const distributorId = req.session.userId;
+
+    if (!distributorId) {
+        return res.status(401).json({ message: "Not authenticated." });
+    }
+
+    try {
+        // Fetch user (for address) and distributor (for contactPhone, availability, etc.)
+        const user = await User.findById(distributorId);
+        const distributor = await Distributor.findOne({ user: distributorId });
+
+        if (!user || !distributor) {
+            return res.status(404).json({ message: "Distributor details not found." });
+        }
+
+        res.status(200).json({
+            name: user.name,
+            email: user.email,
+            contactPhone: distributor.contactPhone || "No phone number",
+            address: user.address || null,
+            available: distributor.available,
+            totalDeliveries: distributor.totalDeliveries,
+            averageRating: distributor.averageRating
+        });
+    } catch (error) {
+        console.error("Error fetching distributor details:", error);
+        res.status(500).json({ message: "Server error" });
     }
 };

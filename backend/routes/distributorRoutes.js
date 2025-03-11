@@ -8,7 +8,7 @@ router.post('/update-availability', authenticateUser ,distributorController.upda
 router.post("/update-info",distributorController.updateDistributorInfo)
 router.get("/assigned-purchases",distributorController.getAssignedPurchases)
 router.post("/update-delivery-status",distributorController.updateDeliveryStatus)
-
+router.get("/get-details",distributorController.getDistributorDetails)
 
 router.post("/rate-distributor", distributorController.rateDistributor);
 

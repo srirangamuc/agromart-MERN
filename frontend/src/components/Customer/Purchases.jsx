@@ -29,9 +29,10 @@ const StatusBadge = ({ status }) => {
     );
 };
 
-const RatingStars = ({ purchaseId, initialRating, onRate }) => {
+const RatingStars = ({ purchaseId, initialRating, deliveryStatus, onRate }) => {
     const [rating, setRating] = useState(initialRating);
     const [isRated, setIsRated] = useState(!!initialRating);
+    const isDeliveryCompleted = deliveryStatus === 'delivered';
 
     useEffect(() => {
         setRating(initialRating);
@@ -39,7 +40,7 @@ const RatingStars = ({ purchaseId, initialRating, onRate }) => {
     }, [initialRating]);
 
     const handleRating = async (newRating) => {
-        if (isRated) return;
+        if (isRated || !isDeliveryCompleted) return;
 
         try {
             await purchasesService.rateDistributor(purchaseId, newRating);
@@ -58,8 +59,8 @@ const RatingStars = ({ purchaseId, initialRating, onRate }) => {
             {[1, 2, 3, 4, 5].map((star) => (
                 <Star 
                     key={star} 
-                    className={`w-5 h-5 ${rating >= star ? 'text-yellow-500' : 'text-gray-300'} ${isRated ? 'cursor-not-allowed' : 'cursor-pointer'}`} 
-                    onClick={() => !isRated && handleRating(star)}
+                    className={`w-5 h-5 ${rating >= star ? 'text-yellow-500' : 'text-gray-300'} ${isRated || !isDeliveryCompleted ? 'cursor-not-allowed' : 'cursor-pointer'}`} 
+                    onClick={() => !isRated && isDeliveryCompleted && handleRating(star)}
                 />
             ))}
         </div>
@@ -152,6 +153,7 @@ const Purchases = () => {
                                                 <RatingStars 
                                                     purchaseId={purchase._id} 
                                                     initialRating={purchase.distributorRating} 
+                                                    deliveryStatus={purchase.deliveryStatus} 
                                                     onRate={fetchPurchases} 
                                                 />
                                             </td>
@@ -160,13 +162,7 @@ const Purchases = () => {
                                 </tbody>
                             </table>
                         </div>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-                            <Package className="w-16 h-16 text-gray-300 mb-4" />
-                            <h2 className="text-xl font-semibold text-gray-600 mb-2">No Purchases Yet</h2>
-                            <p className="text-gray-500">You haven&apos;t made any purchases. Start shopping!</p>
-                        </div>
-                    )}
+                    ) : null}
                 </div>
             </div>
         </div>
