@@ -103,16 +103,29 @@ app.use(session({
         // sameSite: 'lax'
     }
 }));
-const csrfProtection = csrf({
-    cookie: {
-        httpOnly: true,
+
+
+app.use('/api/vendor', vendorRoutes);
+app.use('/api/customer', customerRoutes);
+app.use('/api/admin', adminRoutes);
+app.use("/api/distributor", distributorRoutes);
+
+// const csrfProtection = csrf({
+//     cookie: {
+//         httpOnly: true,
   
-    }
-});
+//     }
+// });
 
 // Logging middleware
 app.use(morgan(':custom')); // Console logging
 app.use(morgan(':file-format', { stream: accessLogStream })); // File logging
+
+app.use((req, res, next) => {
+    console.log("🟢 SESSION DATA:", req.session);
+    next();
+});
+
 
 // Custom error logger middleware
 app.use((req, res, next) => {
@@ -138,7 +151,6 @@ app.use((req, res, next) => {
 
 // Static files and view engine setup
 app.use(express.static('public'));
-app.set('view engine', 'ejs');
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI || "mongodb+srv://freshmart:FDWyAmiXk89asnNd@freshmart.mtbq8.mongodb.net/farmer")
@@ -149,25 +161,6 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb+srv://freshmart:FDWyAmiXk89
         appendToLog(getLogFilename('db-errors'), err.message);
     });
 
-app.use((err, req, res, next) => {
-    if (err.code === 'EBADCSRFTOKEN') {
-        res.status(403).json({
-            error: 'Invalid CSRF token',
-            message: 'Form submission failed. Please try again.'
-        });
-    } else {
-        next(err);
-    }
-});
-
-// Routes that don't need CSRF protection
-app.get('/', (req, res) => {
-    res.render("index");
-});
-
-app.get('/csrf-token', (req, res) => {
-    res.json({ csrfToken: req.csrfToken() });
-});
 
 // Authentication routes with CSRF protection
 app.post('/api/login', authController.login);
@@ -175,10 +168,18 @@ app.post('/api/signup', authController.signup);
 app.get('/api/logout', authController.logout);
 
 // API routes with CSRF protection
-app.use('/api/vendor', vendorRoutes);
-app.use('/api/customer', customerRoutes);
-app.use('/api/admin', adminRoutes);
-app.use("/api/distributor", distributorRoutes);
+
+
+// app.use((err, req, res, next) => {
+//     if (err.code === 'EBADCSRFTOKEN') {
+//         res.status(403).json({
+//             error: 'Invalid CSRF token',
+//             message: 'Form submission failed. Please try again.'
+//         });
+//     } else {
+//         next(err);
+//     }
+// });
 
 // Global error handler
 app.use((err, req, res, next) => {

@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const Purchase = require('../models/purchaseModel');
 const Item = require('../models/itemModel');
 const bcrypt = require('bcrypt');
+
 const STRIPE_SECRET_KEY = 'sk_test_51Q1BEGDvKfDjvcpCsEqOVgaKLyoDU660JD41lqYzQU3G9KUsvFmcDiJ72dLMexorHUr4rC91KPBmMeiJxDZlpgru00gDvBILze';
 const stripe = require('stripe')(STRIPE_SECRET_KEY);
 const Vendor = require('../models/vendorModel')
@@ -164,55 +165,66 @@ class CustomerController {
     async checkout(req, res) {
         const { paymentMethod } = req.body;
         console.log("Fetched data:", req.body);
-
+    
         try {
             const user = await User.findById(req.session.userId).populate('cart.item');
             if (!user) {
                 return res.status(400).json({ error: 'User not found' });
             }
-
+    
             const { address } = user;
             if (!address || !address.hno || !address.street || !address.city || 
                 !address.state || !address.country || !address.zipCode) {
                 return res.status(400).json({ error: 'Please provide a complete address before checkout.' });
             }
-
-            // Find the distributor based on the city
-            const distributor = await User.findOne({
-                role: 'distributor',
-                'address.city': address.city
-            });
-
-            if (!distributor) {
-                return res.status(400).json({ error: 'No distributor available in your city' });
+            console.log(address.city)
+    
+            // ✅ Fetch available distributors from `User`, NOT `Distributor`
+            const availableDistributors = await Distributor.find({
+                available: true
+            }).populate('user'); // Ensure user details are fetched
+            
+            const filteredDistributors = availableDistributors.filter(dist => dist.user.address.city === address.city);
+            
+            console.log("✅ Available Distributors in City:", filteredDistributors);
+            
+            if (!filteredDistributors.length) {
+                return res.status(400).json({ error: 'No available distributor in your city' });
             }
-
-
+            
+            // Select a random distributor
+            const assignedDistributor = filteredDistributors[
+                Math.floor(Math.random() * filteredDistributors.length)
+            ];
+            
+            console.log("✅ Assigned Distributor:", assignedDistributor.user.name);
+            
+    
             const itemsToPurchase = user.cart.filter(cartItem => cartItem.item);
             if (itemsToPurchase.length === 0) {
                 return res.status(400).json({ error: 'Your cart is empty or contains invalid items' });
             }
-
+    
             // Process each item in cart
             for (const cartItem of itemsToPurchase) {
                 const item = await Item.findById(cartItem.item._id);
                 if (!item) {
                     return res.status(400).json({ error: `Item not found: ${cartItem.item.name}` });
                 }
-
+    
                 // Get all vendor entries for this item
                 const vendorItems = await Vendor.find({ 
                     itemName: item.name,
                     quantity: { $gt: 0 }
                 }).sort({ timestamp: 1 }); // Process oldest entries first
-
+    
                 let remainingQuantityNeeded = cartItem.quantity;
                 if (vendorItems.length === 0) {
                     return res.status(400).json({ 
                         error: `No vendor inventory available for ${item.name}` 
                     });
                 }
-
+    
                 // Check if we can fulfill the order
                 const totalAvailableQuantity = vendorItems.reduce((sum, vendor) => sum + vendor.quantity, 0);
                 if (totalAvailableQuantity < remainingQuantityNeeded) {
@@ -220,47 +232,41 @@ class CustomerController {
                         error: `Insufficient quantity available for ${item.name}. Available: ${totalAvailableQuantity}kg` 
                     });
                 }
-
-                // Will update these after payment confirmation
-                cartItem.vendorAllocations = [];
-
+    
                 // Allocate quantities from vendors
+                cartItem.vendorAllocations = [];
+    
                 for (const vendorItem of vendorItems) {
                     if (remainingQuantityNeeded <= 0) break;
-
+    
                     const quantityFromThisVendor = Math.min(
                         vendorItem.quantity,
                         remainingQuantityNeeded
                     );
-
+    
                     cartItem.vendorAllocations.push({
                         vendorId: vendorItem.vendor,
                         quantity: quantityFromThisVendor,
                         pricePerKg: vendorItem.pricePerKg
                     });
-
+    
                     remainingQuantityNeeded -= quantityFromThisVendor;
                 }
             }
-
+    
             const totalAmount = itemsToPurchase.reduce((total, cartItem) => {
                 return total + (cartItem.item.pricePerKg * cartItem.quantity * 1.5);
             }, 0);
-
+    
             let discount = 0;
             if (user.subscription === 'pro') {
                 discount = totalAmount * 0.10;
             } else if (user.subscription === 'pro plus') {
                 discount = totalAmount * 0.20;
             }
-
+    
             const finalAmount = totalAmount - discount;
-
-            if (!user.address || !user.address.hno || !user.address.street || !user.address.city || 
-                !user.address.state || !user.address.country || !user.address.zipCode) {
-                return res.status(400).json({ error: 'Please fill in all the required address fields before checkout.' });
-            }
-
+    
             if (paymentMethod === 'COD') {
                 // Create purchase record
                 const purchase = new Purchase({
@@ -275,12 +281,11 @@ class CustomerController {
                     status: 'received',
                     totalAmount: finalAmount,
                     address: user.address,
-                    deliveryStatus:'assigned',
-                    assignedDistributor:distributor._id
-
+                    deliveryStatus: 'assigned',
+                    assignedDistributor: assignedDistributor._id
                 });
                 await purchase.save();
-
+    
                 // Update vendor quantities and profits
                 for (const cartItem of itemsToPurchase) {
                     for (const allocation of cartItem.vendorAllocations) {
@@ -288,14 +293,14 @@ class CustomerController {
                             vendor: allocation.vendorId,
                             itemName: cartItem.item.name
                         });
-
+    
                         if (vendorItem) {
                             vendorItem.quantity -= allocation.quantity;
                             vendorItem.quantitySold += allocation.quantity;
                             vendorItem.profit += allocation.quantity * allocation.pricePerKg;
                             await vendorItem.save();
                         }
-
+    
                         // Update main item quantity
                         const item = await Item.findById(cartItem.item._id);
                         if (item) {
@@ -308,13 +313,16 @@ class CustomerController {
                         }
                     }
                 }
-
-                distributor.totalDeliveries += 1;
-                await distributor.save();
-
+    
+                // ✅ Update distributor's total deliveries (MUST BE IN `User`, NOT `Distributor`)
+                await User.findByIdAndUpdate(assignedDistributor._id, {
+                    $inc: { totalDeliveries: 1 }
+                });
+    
                 user.cart = [];
                 await user.save();
                 return res.json({ success: 'Order placed successfully' });
+    
             } else if (paymentMethod === 'stripe') {
                 try {
                     const session = await stripe.checkout.sessions.create({
@@ -330,10 +338,11 @@ class CustomerController {
                         mode: 'payment',
                         success_url: `http://localhost:5173/success`,
                         cancel_url: `http://localhost:5173/cancel`,
-
                     });
-
+    
                     res.json({ sessionUrl: session.url });
+    
+                    // Create purchase record
                     const purchase = new Purchase({
                         user: user._id,
                         items: itemsToPurchase.map(cartItem => ({
@@ -346,26 +355,15 @@ class CustomerController {
                         status: 'received',
                         totalAmount: finalAmount,
                         address: user.address,
-                        deliveryStatus:'assigned',
-                        assignedDistributor: distributor._id
+                        deliveryStatus: 'assigned',
+                        assignedDistributor: assignedDistributor._id
                     });
                     await purchase.save();
-
-                    for (const cartItem of itemsToPurchase) {
-                        const item = await Item.findById(cartItem.item._id);
-                        if (item) {
-                            item.quantity -= cartItem.quantity;
-                            if (item.quantity <= 0) {
-                                await Item.findByIdAndDelete(item._id);
-                            } else {
-                                await item.save();
-                            }
-                        }
-                    }
-
-                    distributor.totalDeliveries += 1;
-                    await distributor.save();
-
+    
+                    await User.findByIdAndUpdate(assignedDistributor._id, {
+                        $inc: { totalDeliveries: 1 }
+                    });
+    
                     user.cart = [];
                     await user.save();
                 } catch (error) {
@@ -378,6 +376,8 @@ class CustomerController {
             return res.status(500).json({ error: 'Something went wrong during checkout. Please try again.' });
         }
     }
+    
+    
 
     async cancel(req, res) {
         res.json({ message: 'Payment canceled' });

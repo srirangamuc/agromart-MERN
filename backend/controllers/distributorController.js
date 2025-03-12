@@ -4,31 +4,32 @@ const Distributor = require("../models/distributorModel");
 const Purchase = require("../models/purchaseModel")
 
 exports.getDistributorDetails = async (req, res) => {
-    const distributorId = req.session.userId; 
+    console.log("🔥 getDistributorDetails REACHED!");
+
+    const distributorId = req.session.userId;
 
     if (!distributorId) {
+        console.log("🚨 ERROR: No session userId found");
         return res.status(401).json({ message: "Not authenticated." });
     }
 
     try {
+        console.log("🔍 Looking for distributor with ID:", distributorId);
         const distributor = await User.findById(distributorId);
-
         if (!distributor || distributor.role !== "distributor") {
+            console.log("🚨 Distributor not found in User model");
             return res.status(404).json({ message: "Distributor details not found." });
         }
 
-        // Fetch additional distributor details from Distributor model
-        const distributorData = await Distributor.findOne({ user: distributorId });
-
-        res.status(200).json({ 
-            ...distributor.toObject(),
-            available: distributorData?.available ?? false 
-        });
+        console.log("✅ Distributor Found:", distributor);
+        res.status(200).json(distributor);
     } catch (error) {
-        console.error("Error fetching distributor details:", error);
+        console.error("❌ ERROR:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
+
+
 
 exports.updateAvailability = async (req, res) => {
     const distributorId = req.session.userId;
@@ -123,16 +124,31 @@ exports.getAssignedPurchases = async (req, res) => {
     }
 
     try {
+        console.log("🔍 Fetching distributor details for user ID:", distributorId);
+        
+        // ✅ Fix: Ensure we are fetching distributor details correctly
+        const distributor = await Distributor.findOne({ user: distributorId }).populate("user");
+        if (!distributor) {
+            console.log("🚨 ERROR: No distributor found for user ID:", distributorId);
+            return res.status(404).json({ message: "Distributor not found." });
+        }
+
+        console.log("✅ Distributor Exists:", distributor);
+
+        // ✅ Fix: Ensure purchases are assigned correctly
         const purchases = await Purchase.find({ assignedDistributor: distributorId })
             .populate("user", "name email") 
             .populate("items.item", "name pricePerKg");
 
+        console.log("✅ Assigned Purchases Fetched:", purchases);
+
         res.status(200).json(purchases);
     } catch (error) {
-        console.error("Error fetching assigned purchases:", error);
+        console.error("❌ Error fetching assigned purchases:", error);
         res.status(500).json({ message: "Server error." });
     }
 };
+
 
 exports.updateDeliveryStatus = async (req, res) => {
     const distributorId = req.session.userId;
