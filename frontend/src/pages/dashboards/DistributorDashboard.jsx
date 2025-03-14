@@ -241,6 +241,7 @@ const DistributorDashboard = () => {
         if (!response.ok) throw new Error("Failed to fetch assigned purchases")
 
         const data = await response.json()
+        console.log("Assigned purchases:", data)
         setPurchases(data)
       } catch (error) {
         console.error("Error fetching assigned purchases:", error)

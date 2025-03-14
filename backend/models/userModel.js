@@ -21,9 +21,11 @@ const userSchema = new mongoose.Schema({
         enum: ['admin', 'customer', 'vendor','distributor'],
         default: 'customer'
     },
-    cart:[{
-        item:{type:mongoose.Schema.Types.ObjectId,ref:'Item'},
-        quantity:{type:Number,required:true}
+    cart: [{
+        vendor: { type: mongoose.Schema.Types.ObjectId, ref: 'Vendor' }, // Track vendor
+        item: { type: mongoose.Schema.Types.ObjectId, ref: 'Item' }, // Track item
+        quantity: { type: Number, required: true },
+        pricePerKg: { type: Number, required: true } // Store price in case vendors have different rates
     }],
     subscription: {
         type: String,

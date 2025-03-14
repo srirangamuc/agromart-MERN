@@ -1,8 +1,36 @@
 const BASE_URL = 'http://localhost:5000/api/customer'; // Local development URL
 
 export const cartServices = {
+
   // Fetch cart items for the user
-  async fetchCart() {
+  // Add an item to the cart
+  // Ensure this is correct
+
+  async addToCart(itemName, vendorId, quantity) {
+    try {
+        const response = await fetch(`${BASE_URL}/add-to-cart`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ itemName, vendorId, quantity }),
+        });
+
+        if (!response.ok) {
+            const errorResponse = await response.json();
+            throw new Error(`Failed to add item to cart: ${errorResponse.error || response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error adding item to cart:', error.message);
+        throw new Error('Failed to add item to cart. Please try again.');
+    }
+},
+  // Fetch cart items for the user
+  /*async fetchCart() {
     try {
       const response = await fetch(`${BASE_URL}/get-cart`, {
         method: 'GET',
@@ -19,29 +47,47 @@ export const cartServices = {
       console.error('Error fetching cart:', error.message);
       throw new Error('Failed to fetch cart. Please try again.');
     }
-  },
+  },*/
+  async fetchCart() {
+    try {
+        const response = await fetch(`${BASE_URL}/get-cart`, {
+            method: 'GET',
+            credentials: 'include',
+        });
+
+        const data = await response.json();
+        console.log("Fetched Cart Data:", data); // Log the cart data
+        return data;
+    } catch (error) {
+        console.error('Error fetching cart:', error.message);
+        throw new Error('Failed to fetch cart. Please try again.');
+    }
+},
 
   // Delete an item from the cart
-  async deleteFromCart(itemId) {
+  async deleteFromCart(itemId, vendorId) {
+    if (!itemId || !vendorId) {
+        console.error("Invalid itemId or vendorId:", itemId, vendorId);
+        throw new Error("Invalid request: itemId or vendorId is missing.");
+    }
+  
     try {
-      const response = await fetch(`${BASE_URL}/delete-from-cart`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ itemId }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to delete item from cart: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data; // Return the updated cart data after deletion
+        const response = await fetch(`${BASE_URL}/delete-from-cart/${itemId}/${vendorId}`, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+  
+        if (!response.ok) {
+            throw new Error(`Failed to delete item from cart: ${response.statusText}`);
+        }
+  
+        return await response.json();
     } catch (error) {
-      console.error('Error deleting from cart:', error.message);
-      throw new Error('Failed to delete item from cart. Please try again.');
+        console.error('Error deleting from cart:', error.message);
+        throw new Error('Failed to delete item from cart. Please try again.');
     }
   },
 

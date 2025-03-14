@@ -4,14 +4,22 @@ const customerController = require('../controllers/customerController'); // Assu
 
 // Customer dashboard
 router.get('/products', (req, res) => customerController.getCustomerDashBoard(req, res));
-
+router.get('/vendors/:itemName',(req, res) => customerController.getVendorsByItem(req, res));
 router.get('/get-cart', (req, res) => customerController.getCart(req, res));
 
 // Add item to cart
-router.post('/add-to-cart', (req, res) => customerController.addToCart(req, res));
+// router.post('/add-to-cart', (req, res) => customerController.addToCart(req, res));
 
+// Add Item to Cart - Debugging Logs Added
+router.post('/add-to-cart', (req, res) => {
+    console.log("POST /add-to-cart Request Body:", req.body);
+    customerController.addToCart(req, res);
+});
 // Delete an item from the cart
-router.post('/delete-from-cart', (req, res) => customerController.deleteFromCart(req, res));
+// router.post('/delete-from-cart', (req, res) => customerController.deleteFromCart(req, res));
+
+router.delete('/delete-from-cart/:itemId/:vendorId', customerController.deleteFromCart);
+
 
 // Checkout
 router.post('/checkout', (req, res) => customerController.checkout(req, res));

@@ -16,8 +16,8 @@ function Cart() {
         try {
             setIsLoading(true);
             const data = await cartServices.fetchCart();
-            setCartItems(data.cartItems);
-            // Ensure totalCartValue is a number
+            console.log("Cart Data in Component:", data); // Log the data inside Cart.jsx
+            setCartItems(data.cartItems || []); // Ensure state updates properly
             setTotalCartValue(Number(data.totalCartValue) || 0);
         } catch (error) {
             console.error("Error fetching cart data:", error);
@@ -27,10 +27,11 @@ function Cart() {
         }
     };
 
-    const handleDelete = async (itemId) => {
+    const handleDelete = async (itemId, vendorId) => {
         try {
-            await cartServices.deleteFromCart(itemId);
-            fetchCartData();
+            console.log(itemId,vendorId);
+            await cartServices.deleteFromCart(itemId, vendorId);  // Pass both values
+            fetchCartData();  // Refresh cart after deletion
         } catch (error) {
             console.error("Error deleting item:", error);
         }
@@ -93,14 +94,23 @@ function Cart() {
                                     <div className="flex items-center space-x-6">
                                         <div className="bg-gray-100 p-3 rounded-xl">
                                             <img 
-                                                src={`src/assets/images/resized_images/${cartItem.name}.png`}
+                                                src={`src/assets/images/resized_images/${cartItem.itemName}.png`}
                                                 alt={cartItem.name}
                                                 className="w-16 h-16 object-cover rounded-lg"
                                             />
                                         </div>
                                         <div>
                                             <h3 className="text-xl font-semibold text-gray-800">{cartItem.name}</h3>
-                                            <p className="text-gray-500">Quantity: {cartItem.cartQuantity}</p>
+                                            <div className="flex space-x-6 text-gray-500">
+                                                <p>
+                                                    <span className="font-semibold text-lg">Quantity:</span> {cartItem.cartQuantity}
+                                                </p>
+                                                <p>
+                                                    <span className="font-semibold text-lg">Vendor:</span> {cartItem.vendorName}
+                                                </p>
+                                            </div>
+
+                                            
                                         </div>
                                     </div>
                                     <div className="flex items-center space-x-6">
@@ -108,11 +118,14 @@ function Cart() {
                                             ₹{(cartItem.totalPrice || 0).toFixed(2)}
                                         </span>
                                         <button
-                                            onClick={() => handleDelete(cartItem._id)}
-                                            className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition-colors"
-                                        >
-                                            <Trash2 className="w-6 h-6" />
-                                        </button>
+                                        onClick={() => {
+                                            console.log("Clicked Delete for Item:", cartItem);
+                                            handleDelete(cartItem.itemId, cartItem.vendorId);
+                                        }}
+                                        className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition-colors"
+                                    >
+                                        <Trash2 className="w-6 h-6" />
+                                    </button>
                                     </div>
                                 </div>
                             ))}

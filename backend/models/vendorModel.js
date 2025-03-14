@@ -7,8 +7,15 @@ const vendorSchema = new mongoose.Schema({
     quantitySold : {type : Number, default : 0 },
     timestamp : {type: Date, default:Date.now},
     pricePerKg: { type: Number, required: true },
-    profit: { type: Number, default:0 } 
+    profit: { type: Number, default:0 },
 
+
+    // new fields to be added here regarding vendor rating
+
+    // New fields for rating system
+    ratingCount: { type: Number, default: 0 },
+    totalRatings: { type: Number, default: 0 },
+    averageRating: { type: Number, default: 0 }
 });
 
 const Vendor = mongoose.model('Vendor', vendorSchema);

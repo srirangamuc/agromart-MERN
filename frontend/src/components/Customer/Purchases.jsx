@@ -67,6 +67,49 @@ const RatingStars = ({ purchaseId, initialRating, deliveryStatus, onRate }) => {
     );
 };
 
+
+// new Method for vendor ratings
+
+const VendorRatingStars = ({ purchaseId, vendorId, initialRating, purchaseStatus, onRate }) => {
+    const [rating, setRating] = useState(initialRating);
+    const [isRated, setIsRated] = useState(!!initialRating);
+    const isPurchaseCompleted = purchaseStatus === 'completed';
+
+    useEffect(() => {
+        setRating(initialRating);
+        setIsRated(!!initialRating);
+    }, [initialRating]);
+
+    const handleRating = async (newRating) => {
+        if (isRated || !isPurchaseCompleted) return;
+
+        try {
+            await purchasesService.rateVendor(purchaseId, vendorId, newRating);
+            setRating(newRating);
+            setIsRated(true);
+            toast.success("Thanks for rating the vendor!");
+            onRate();
+        } catch (err) {
+            console.error("Error submitting rating:", err);
+            toast.error("Failed to submit rating.");
+        }
+    };
+
+    return (
+        <div className="flex space-x-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+                <Star 
+                    key={star} 
+                    className={`w-5 h-5 ${rating >= star ? 'text-yellow-500' : 'text-gray-300'} 
+                    ${isRated || !isPurchaseCompleted ? 'cursor-not-allowed' : 'cursor-pointer'}`} 
+                    onClick={() => !isRated && isPurchaseCompleted && handleRating(star)}
+                />
+            ))}
+        </div>
+    );
+};
+
+
 const Purchases = () => {
     const [purchases, setPurchases] = useState([]);
     const [error, setError] = useState(null);
@@ -156,6 +199,24 @@ const Purchases = () => {
                                                     deliveryStatus={purchase.deliveryStatus} 
                                                     onRate={fetchPurchases} 
                                                 />
+                                                
+
+                                                {purchase.items.map((item, index) => {
+                                                    const vendorId = item.vendor?._id || item.vendor;  // Handle both ObjectId and string cases
+                                                    return (
+                                                        <VendorRatingStars
+                                                        key={index}
+                                                        purchaseId={purchase._id} 
+                                                        vendorId={item.vendor ? item.vendor.toString() : null}  // ✅ Handle missing vendor
+                                                        initialRating={purchase.vendorRatings.find(vr => vr.vendor?.toString() === item.vendor?.toString())?.rating || 0}
+                                                        purchaseStatus={purchase.status} 
+                                                        onRate={fetchPurchases} 
+                                                    />
+
+                                                    );
+                                                })}
+
+
                                             </td>
                                         </tr>
                                     ))}

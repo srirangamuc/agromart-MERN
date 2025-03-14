@@ -47,56 +47,104 @@ class CustomerController {
             return res.status(500).json({ error: 'Something went wrong during checkout. Please try again.' });
         }
     }
-    async addToCart(req, res) {
+    // new Method
+
+    async getVendorsByItem (req, res) {
         try {
-            const { itemId, quantity } = req.body; // Now accepting quantity directly from request
+            const { itemName } = req.params;
+            const vendors = await Vendor.find({ itemName }).populate('vendor', 'name');
+    
+            if (!vendors.length) {
+                return res.status(404).json({ message: 'No vendors found for this item.' });
+            }
+    
+            const result = vendors.map(vendor => ({
+                vendor: vendor.vendor.name,
+                timestamp: vendor.timestamp,
+                quantity: vendor.quantity,//- vendor.quantitySold,
+                pricePerKg: vendor.pricePerKg,
+               id: vendor._id
+    
+            }));
+    
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: 'Server error' });
+        }
+      }
+
+      async addToCart(req, res) {
+        try {
+            const { vendorId, itemName, quantity } = req.body;
             const userId = req.session.userId;
-            
+             console.log("Fetched data:", vendorId, itemName, quantity ) ;
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
             }
-            
+    
             const user = await User.findById(userId);
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
             }
-
-            // Get total available quantity from Item model
-            const item = await Item.findById(itemId);
+    
+            // Fetch the item separately
+            const item = await Item.findOne({ name: itemName });
+            console.log("Item:", item);
             if (!item) {
                 return res.status(404).json({ error: 'Item not found' });
             }
-
-            // Validate the quantity
-            if (!quantity || quantity <= 0) {
-                return res.status(400).json({ error: 'Please enter a valid quantity greater than 0' });
+        var itemId = item._id;
+        console.log("Item Id:", itemId);
+            // Fetch the vendor details
+            const vendorItem = await Vendor.findById(vendorId);
+            if (!vendorItem) {
+                return res.status(404).json({ error: 'Vendor not found' });
             }
-
-            // Calculate current cart quantity for this item
-            const existingCartItem = user.cart.find(item => 
-                item.item.toString() === itemId.toString()
-            );
-            const currentCartQuantity = existingCartItem ? existingCartItem.quantity : 0;
-            const newTotalQuantity = currentCartQuantity + parseFloat(quantity);
-
-            // Check if total quantity exceeds available quantity
-            if (newTotalQuantity > item.quantity) {
+    
+            // Check if vendor is actually selling the requested item
+            if (vendorItem.itemName !== item.name) {
+                return res.status(400).json({ error: 'Vendor does not sell this item' });
+            }
+    
+            // Validate stock availability
+            if (!quantity || quantity <= 0 || quantity > vendorItem.quantity) {
                 return res.status(400).json({ 
-                    error: `Cannot add ${quantity}kg to cart. Only ${item.quantity}kg available.` 
+                    error: `Invalid quantity. Only ${vendorItem.quantity}kg available from this vendor.` 
                 });
             }
-            
-            if (existingCartItem) {
-                existingCartItem.quantity = newTotalQuantity;
-            } else {
-                user.cart.push({ item: itemId, quantity: parseFloat(quantity) });
-            }
-            
-            await user.save();
-            res.json({ 
-                success: 'Item added to cart successfully',
-                newQuantity: newTotalQuantity
+    
+            // Check if the same vendor-item pair already exists in the cart
+           // Check if the same vendor-item pair already exists in the cart
+            const existingCartItem = user.cart.find(cartItem => {
+                console.log("Cart Item:", cartItem.toString(), cartItem.item.toString(), cartItem.vendor.toString());
+                console.log("Item Id:", itemId.toString());
+                console.log("Vendor Id:", vendorId.toString());
+                // Prevent undefined property access
+                if (!cartItem.item || !cartItem.vendor) {
+                    console.error("Cart item has undefined fields:", cartItem);
+                    return false;
+                }
+
+                return (
+                    cartItem.item.toString() === itemId.toString() &&
+                    cartItem.vendor.toString() === vendorId.toString()
+                );
             });
+
+            if (existingCartItem) {
+                existingCartItem.quantity += parseFloat(quantity);
+            } else {
+                user.cart.push({ 
+                    vendor: vendorId, 
+                    item: itemId, 
+                    quantity: parseFloat(quantity),
+                    pricePerKg: vendorItem.pricePerKg 
+                });
+            }
+    
+            await user.save();
+            res.json({ success: 'Item added to cart successfully' });
+    
         } catch (error) {
             console.error("Add to cart error:", error);
             return res.status(500).json({ error: 'Something went wrong. Please try again.' });
@@ -104,57 +152,79 @@ class CustomerController {
     }
     async deleteFromCart(req, res) {
         try {
-            const { itemId } = req.body;
+            const { itemId, vendorId } = req.params;
             const userId = req.session.userId;
     
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
             }
     
+            if (!itemId || !vendorId) {
+                return res.status(400).json({ error: 'Invalid request. Missing itemId or vendorId.' });
+            }
+    
             const user = await User.findById(userId);
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
             }
-        
-            // Filter out the cart item by matching the itemId
-            user.cart = user.cart.filter(cartItem => !cartItem.item.equals(itemId));
     
-            console.log("Updated cart after deletion:", user.cart);
+            user.cart = user.cart.filter(cartItem =>
+                !(cartItem.item.equals(itemId) && cartItem.vendor.equals(vendorId))
+            );
     
             await user.save();
-            res.json({ success: 'Item removed from cart successfully' });
+            return res.json({ success: 'Item removed from cart successfully' });
+    
         } catch (error) {
-            console.error("Checkout error:", error);
-            return res.status(500).json({ error: 'Something went wrong during checkout. Please try again.' });
+            console.error("Delete from cart error:", error);
+            return res.status(500).json({ error: 'Something went wrong. Please try again.' });
         }
     }
+
+
+
     async getCart(req, res) {
         try {
-            const userId = req.session.userId;    
+            const userId = req.session.userId;
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
             }
     
-            // Find the user and populate the cart items
-            const userWithCart = await User.findById(userId).populate('cart.item'); // Populate cart items with their details
-            
+            const userWithCart = await User.findById(userId)
+                .populate({
+                    path: 'cart.item',
+                    model: 'Item'
+                })
+                .populate({
+                    path: 'cart.vendor',
+                    model: 'Vendor',
+                    populate: { path: 'vendor', model: 'User', select: 'name' } // Get vendor name
+                });
+    
             if (!userWithCart) {
                 return res.status(404).json({ error: 'User not found' });
             }
-    
-            // Calculate total cart value
-            const cartItems = userWithCart.cart.filter(cartItem=>cartItem.item).map(cartItem => ({
-                ...cartItem.item.toObject(), // Convert item to plain object
-                cartQuantity: cartItem.quantity, // Include quantity in the cart item
-                totalPrice: cartItem.item.pricePerKg * cartItem.quantity * 1.5 // Calculate total price for each cart item
+            
+            // Prepare cart details
+            const cartItems = userWithCart.cart.map(cartItem => ({
+                vendorName: cartItem.vendor.vendor.name, // Vendor Name
+                itemName: cartItem.item.name, // Item Name
+                vendorId: cartItem.vendor._id,
+                itemId: cartItem.item._id,
+                cartQuantity: cartItem.quantity,
+                availableStock: cartItem.vendor.quantity, // Remaining stock for this vendor
+                pricePerKg: cartItem.pricePerKg,
+                totalPrice: cartItem.pricePerKg * cartItem.quantity
             }));
     
-            const totalCartValue = cartItems.reduce((total, item) => total + item.totalPrice, 0); // Sum up total value of the cart
+            // Calculate total cart value
+            const totalCartValue = cartItems.reduce((total, item) => total + item.totalPrice, 0);
     
             res.json({ 
-                cartItems: cartItems, 
-                totalCartValue: totalCartValue.toFixed(2) // Send total value as string with 2 decimals
+                cartItems, 
+                totalCartValue: totalCartValue.toFixed(2)
             });
+    
         } catch (error) {
             console.error("Get cart error:", error);
             return res.status(500).json({ error: 'Something went wrong while fetching cart. Please try again.' });
@@ -273,6 +343,7 @@ class CustomerController {
                     user: user._id,
                     items: itemsToPurchase.map(cartItem => ({
                         item: cartItem.item._id,
+                        vendor: cartItem.vendor._id,
                         name: cartItem.item.name,
                         quantity: cartItem.quantity,
                         pricePerKg: cartItem.item.pricePerKg
@@ -282,7 +353,12 @@ class CustomerController {
                     totalAmount: finalAmount,
                     address: user.address,
                     deliveryStatus: 'assigned',
-                    assignedDistributor: assignedDistributor._id
+                    assignedDistributor: assignedDistributor.user._id,
+                    // new one
+                    vendorRatings: itemsToPurchase.map(cartItem => ({
+                        vendor: cartItem.vendor, // Fetch vendor from cart
+                        rating: null // Rating will be added later
+                    }))
                 });
                 await purchase.save();
     
@@ -347,6 +423,7 @@ class CustomerController {
                         user: user._id,
                         items: itemsToPurchase.map(cartItem => ({
                             item: cartItem.item._id,
+                            vendor: cartItem.vendor._id,
                             name: cartItem.item.name,
                             quantity: cartItem.quantity,
                             pricePerKg: cartItem.item.pricePerKg
@@ -356,7 +433,13 @@ class CustomerController {
                         totalAmount: finalAmount,
                         address: user.address,
                         deliveryStatus: 'assigned',
-                        assignedDistributor: assignedDistributor._id
+                        assignedDistributor: assignedDistributor._id,
+
+                        // ✅ Initialize vendor ratings as empty (to be updated later)
+                        vendorRatings: itemsToPurchase.map(cartItem => ({
+                            vendor: cartItem.vendor._id,
+                            rating: null // Initially empty
+                        }))
                     });
                     await purchase.save();
     

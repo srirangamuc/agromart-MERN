@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const vendorController = require('../controllers/vendorController');
 const Vendor = require('../models/vendorModel');
+const authenticateUser = require("../middleware/authMiddleware");
 
 // Route to add a product
 router.post('/add-product', (req, res) => vendorController.addProduct(req, res));
@@ -49,5 +50,14 @@ router.get('/profit-data', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
+// Vendor rating route
+router.post("/rate-vendor", (req, res, next) => {
+    console.log("🔴 Rate Vendor API Hit");
+    console.log("Request Body:", req.body);
+    console.log("Request Headers:", req.headers);
+    next();
+}, authenticateUser, vendorController.rateVendor);
+
 
 module.exports = router;

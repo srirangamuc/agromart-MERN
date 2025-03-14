@@ -1,0 +1,1 @@
+2025-03-13T17:12:21.890Z - {"timestamp":"2025-03-13T17:12:21.889Z","method":"POST","url":"/api/login","status":500,"body":{"email":"Distributor24@freshmart.com","password":"Abhilash12"},"query":{},"params":{},"error":"{\"message\":\"Server error\"}"}

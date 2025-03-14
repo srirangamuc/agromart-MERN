@@ -15,7 +15,12 @@ router.post("/update-info",authenticateUser,distributorController.updateDistribu
 router.get("/assigned-purchases",authenticateUser,distributorController.getAssignedPurchases)
 router.post("/update-delivery-status",authenticateUser,distributorController.updateDeliveryStatus)
 
-router.post("/rate-distributor",authenticateUser, distributorController.rateDistributor);
+// router.post("/rate-distributor",authenticateUser, distributorController.rateDistributor);
+router.post("/rate-distributor", authenticateUser, (req, res, next) => {
+    console.log("Received rating request:", req.body);
+    next();
+}, distributorController.rateDistributor);
+
 
 
 module.exports = router;

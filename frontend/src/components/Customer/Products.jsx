@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { ShoppingCart, Info, Search, Minus, Plus } from "lucide-react"
 import { addToCart } from "../../redux/productSlice"
 import { productsService } from "../../services/productServices"
+import ItemVendorTable from "./Itemtovendor_Table";
 
 const ProductsPage = () => {
   const dispatch = useDispatch()
@@ -14,6 +15,8 @@ const ProductsPage = () => {
   const [filteredProducts, setFilteredProducts] = useState([])
   const [quantities, setQuantities] = useState({})
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isTableOpen, setIsTableOpen] = useState(false);
 
   const slides = [
     {
@@ -81,7 +84,7 @@ const ProductsPage = () => {
     debouncedSearch(value)
   }
 
-  const handleAddToCart = async (itemId) => {
+  /*const handleAddToCart = async (itemId) => {
     try {
       const quantity = 0.5 * quantities[itemId]
       await productsService.addToCart(itemId, quantity)
@@ -90,7 +93,13 @@ const ProductsPage = () => {
       console.error("Error adding item to cart:", error)
       setError(error.message)
     }
-  }
+  }*/
+
+    const handleAddToCart = (product) => {
+      setSelectedProduct(product);
+      console.log(product)
+      setIsTableOpen(true); // Open ItemVendorTable when a product is clicked
+    };
 
   const handleQuantityChange = (itemId, value) => {
     const product = products.find((p) => p._id === itemId)
@@ -319,7 +328,7 @@ const ProductsPage = () => {
                         </button>
                       </div>
                       <button
-                        onClick={() => handleAddToCart(product._id)}
+                        onClick={() => handleAddToCart(product)}//._id
                         disabled={product.quantity <= 0}
                         className={`
                           flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
@@ -335,6 +344,11 @@ const ProductsPage = () => {
                         <span>Add</span>
                       </button>
                     </div>
+                    {isTableOpen && selectedProduct && (
+                      
+                      <ItemVendorTable itemName={selectedProduct.name} onClose={() => setIsTableOpen(false)} />
+                    )}
+                    
                   </div>
                 </div>
               ))}
