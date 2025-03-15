@@ -248,7 +248,45 @@ exports.rateDistributor = async (req, res) => {
         res.status(500).json({ message: "Internal server error." });
     }
 };
+
 exports.getDistributorDetails = async (req, res) => {
+    const distributorId = req.session.userId;
+
+    if (!distributorId) {
+        return res.status(401).json({ message: "Not authenticated." });
+    }
+
+    try {
+        const user = await User.findById(distributorId);
+        const distributor = await Distributor.findOne({ user: distributorId });
+
+        if (!user || !distributor) {
+            return res.status(404).json({ message: "Distributor details not found." });
+        }
+
+        // Fetch assigned deliveries
+        const assignedDeliveries = await Purchase.find({
+            assignedDistributor: distributorId
+        }).populate("user", "name email");
+
+        res.status(200).json({
+            name: user.name,
+            email: user.email,
+            contactPhone: distributor.contactPhone || "No phone number",
+            address: user.address || null,
+            available: distributor.available,
+            totalDeliveries: distributor.totalDeliveries,
+            averageRating: distributor.averageRating,
+            assignedDeliveries
+        });
+    } catch (error) {
+        console.error("Error fetching distributor details:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+
+/*exports.getDistributorDetails = async (req, res) => {
     const distributorId = req.session.userId;
 
     if (!distributorId) {
@@ -277,4 +315,4 @@ exports.getDistributorDetails = async (req, res) => {
         console.error("Error fetching distributor details:", error);
         res.status(500).json({ message: "Server error" });
     }
-};
+};*/

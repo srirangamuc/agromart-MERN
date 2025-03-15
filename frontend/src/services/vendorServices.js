@@ -136,6 +136,26 @@ class vendorService {
             throw error;
         }
     }
+    static async getVendorRating() {
+        try {
+            const response = await fetch(`${BASE_URL}/rating`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch vendor rating');
+            }
+
+            return await response.json(); // Returning average rating & count
+        } catch (error) {
+            console.error('Error fetching vendor rating:', error.message);
+            throw new Error('Failed to fetch vendor rating. Please try again.');
+        }
+    }
 }
 
 export default vendorService;

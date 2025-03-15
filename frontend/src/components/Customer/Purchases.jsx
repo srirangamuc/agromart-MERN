@@ -84,7 +84,7 @@ const VendorRatingStars = ({ purchaseId, vendorId, initialRating, purchaseStatus
         if (isRated || !isPurchaseCompleted) return;
 
         try {
-            await purchasesService.rateVendor(purchaseId, vendorId, newRating);
+            await purchasesService.rateVendor(purchaseId, vendorId, newRating); // ✅ No review sent
             setRating(newRating);
             setIsRated(true);
             toast.success("Thanks for rating the vendor!");
@@ -96,18 +96,22 @@ const VendorRatingStars = ({ purchaseId, vendorId, initialRating, purchaseStatus
     };
 
     return (
-        <div className="flex space-x-1">
+        <div className="vendor-rating">
+            <p>Rate the Vendor:</p>
             {[1, 2, 3, 4, 5].map((star) => (
-                <Star 
-                    key={star} 
-                    className={`w-5 h-5 ${rating >= star ? 'text-yellow-500' : 'text-gray-300'} 
-                    ${isRated || !isPurchaseCompleted ? 'cursor-not-allowed' : 'cursor-pointer'}`} 
-                    onClick={() => !isRated && isPurchaseCompleted && handleRating(star)}
-                />
+                <span
+                    key={star}
+                    onClick={() => handleRating(star)}
+                    style={{ cursor: isRated || !isPurchaseCompleted ? "not-allowed" : "pointer" }}
+                >
+                    {star <= rating ? "⭐" : "☆"}
+                </span>
             ))}
         </div>
     );
 };
+
+
 
 
 const Purchases = () => {
@@ -202,19 +206,30 @@ const Purchases = () => {
                                                 
 
                                                 {purchase.items.map((item, index) => {
-                                                    const vendorId = item.vendor?._id || item.vendor;  // Handle both ObjectId and string cases
+                                                    const vendorId = item.vendor?._id || item.vendor;
+
+                                                    // Skip rendering if vendorId is missing
+                                                    if (!vendorId) return null;
+
+                                                    // Ensure vendorRatings is an array and get the initial rating for this vendor
+                                                    const initialRating = purchase.vendorRatings?.find(vr =>
+                                                        vr.vendor?.toString() === vendorId.toString()
+                                                    )?.rating || 0;
+
                                                     return (
                                                         <VendorRatingStars
-                                                        key={index}
-                                                        purchaseId={purchase._id} 
-                                                        vendorId={item.vendor ? item.vendor.toString() : null}  // ✅ Handle missing vendor
-                                                        initialRating={purchase.vendorRatings.find(vr => vr.vendor?.toString() === item.vendor?.toString())?.rating || 0}
-                                                        purchaseStatus={purchase.status} 
-                                                        onRate={fetchPurchases} 
-                                                    />
-
+                                                            key={index}
+                                                            purchaseId={purchase._id}
+                                                            vendorId={vendorId.toString()}  // Ensure vendorId is always a string
+                                                            initialRating={Number(initialRating)} // Ensure it's a number
+                                                            purchaseStatus={purchase.status}
+                                                            onRate={fetchPurchases}
+                                                        />
                                                     );
                                                 })}
+
+
+
 
 
                                             </td>

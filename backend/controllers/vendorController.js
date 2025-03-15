@@ -1,4 +1,5 @@
 const Item = require('../models/itemModel');
+const VendorRating = require('../models/vendorRatingModel');
 const Vendor = require('../models/vendorModel');
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
@@ -208,72 +209,100 @@ class VendorController {
 
     // new Method regarding Vendor Rating.
     // Function to rate vendor
-    async rateVendor(req, res) {
-        console.log("Vendor rating system entered");
-    
+// New Method regarding Vendor Rating.
+// Function to rate vendor
+async rateVendor(req, res) {
+    console.log("Vendor rating system entered");
+
+    try {
+        const { purchaseId, vendorId, rating } = req.body;
+        console.log("Purchase ID:", purchaseId, "Vendor ID:", vendorId, "Rating:", rating);
+
+        if (rating < 1 || rating > 5) {
+            return res.status(400).json({ message: "Rating must be between 1 and 5" });
+        }
+
+        const purchase = await Purchase.findById(purchaseId);
+        if (!purchase || purchase.status !== "completed") {
+            return res.status(400).json({ message: "You can rate only after purchase is completed" });
+        }
+
+        const purchasedFromVendor = purchase.items.some((item) => item.vendor?.toString() === vendorId.toString());
+        if (!purchasedFromVendor) {
+            return res.status(400).json({ message: "Vendor not found in this purchase" });
+        }
+
+        const vendor = await Vendor.findById(vendorId);
+        if (!vendor) {
+            return res.status(404).json({ message: "Vendor not found" });
+        }
+        let vendor_user=vendor.vendor;
+        console.log("Vendor User:",vendor_user);
+        // ✅ Initialize vendorRatings if missing
+        if (!purchase.vendorRatings) {
+            purchase.vendorRatings = [];
+        }
+
+        // ✅ Check if rating exists & update
+        const existingRatingIndex = purchase.vendorRatings.findIndex((vr) => vr.vendor.toString() === vendorId);
+        if (existingRatingIndex !== -1) {
+            const oldRating = purchase.vendorRatings[existingRatingIndex].rating;
+            console.log(`Updating existing rating: ${oldRating} → ${rating}`);
+
+            // Remove old rating contribution
+            vendor.totalRatings -= oldRating;
+            vendor.ratingCount -= 1;
+
+            // Update the rating in purchase.vendorRatings
+            purchase.vendorRatings[existingRatingIndex].rating = rating;
+        } else {
+            console.log(`🟢 New rating added: ${rating}`);
+
+            // Add new rating
+            purchase.vendorRatings.push({ vendor: vendorId, rating });
+        }
+
+        // ✅ Save updated purchase
+        await purchase.save();
+        console.log("✅ Purchase rating updated successfully!");
+       
+        let vendorRating = await VendorRating.findOne({ vendor: vendor_user});
+
+        if (!vendorRating) {
+            vendorRating = new VendorRating({
+                vendor: vendor_user,
+                ratingCount: 1,
+                totalRatings: rating,
+                averageRating: rating,
+            });
+        } else {
+            vendorRating.totalRatings += rating;
+            vendorRating.ratingCount += 1;
+            vendorRating.averageRating = (vendorRating.totalRatings / vendorRating.ratingCount).toFixed(2);
+        }
+
+        await vendorRating.save();
+        res.json({ message: "Vendor rating submitted successfully.", averageRating: vendorRating.averageRating });
+    } catch (error) {
+        console.error("❌ Error in rating vendor:", error);
+        res.status(500).json({ message: "Internal server error." });
+    }
+}
+
+
+    async  getVendorRating(req, res) {
         try {
-            const { purchaseId, vendorId, rating } = req.body;
-            console.log("Purchase ID:", purchaseId);
+            const vendorId  =  req.session.userId;
             console.log("Vendor ID:", vendorId);
-            console.log("Rating:", rating);
+            const vendorRating = await VendorRating.findOne({ vendor: vendorId });
     
-            if (rating < 1 || rating > 5) {
-                return res.status(400).json({ message: "Rating must be between 1 and 5" });
+            if (!vendorRating) {
+                return res.json({ averageRating: 0, ratingCount:0 });;
             }
-    
-            const purchase = await Purchase.findById(purchaseId);
-            if (!purchase || purchase.status !== "completed") {
-                return res.status(400).json({ message: "You can rate only after purchase is completed" });
-            }
-    
-            // ✅ Ensure vendor is part of the purchase
-            const purchasedFromVendor = purchase.items.some((item) => item.vendor?.toString() === vendorId.toString());
-    
-            if (!purchasedFromVendor) {
-                return res.status(400).json({ message: "Vendor not found in this purchase" });
-            }
-    
-            const vendor = await Vendor.findById(vendorId);
-            if (!vendor) {
-                return res.status(404).json({ message: "Vendor not found" });
-            }
-    
-            // ✅ Initialize `vendorRatings` if missing
-            if (!purchase.vendorRatings) {
-                purchase.vendorRatings = [];
-            }
-    
-            // ✅ Check if rating exists & update
-            const existingRatingIndex = purchase.vendorRatings.findIndex((vr) => vr.vendor.toString() === vendorId);
-            if (existingRatingIndex !== -1) {
-                const oldRating = purchase.vendorRatings[existingRatingIndex].rating;
-                console.log(`🟡 Updating existing rating: ${oldRating} → ${rating}`);
-    
-                // Remove old rating contribution
-                vendor.totalRatings -= oldRating;
-                vendor.ratingCount -= 1;
-    
-                // Update the rating in `purchase.vendorRatings`
-                purchase.vendorRatings[existingRatingIndex].rating = rating;
-            } else {
-                console.log(`🟢 New rating added: ${rating}`);
-    
-                // Add new rating
-                purchase.vendorRatings.push({ vendor: vendorId, rating });
-            }
-    
-            // ✅ Save updated purchase & vendor
-            await purchase.save();
-            console.log("✅ Purchase rating updated successfully!");
-    
-            vendor.totalRatings += rating;
-            vendor.ratingCount += 1;
-            vendor.averageRating = (vendor.totalRatings / vendor.ratingCount).toFixed(2);
-            await vendor.save();
-    
-            res.json({ message: "Vendor rating submitted successfully.", averageRating: vendor.averageRating });
+           console.log("Vendor Rating:", vendorRating.averageRating, "Rating Count:", vendorRating.ratingCount,res);
+            res.json({ averageRating: vendorRating.averageRating, ratingCount: vendorRating.ratingCount });
         } catch (error) {
-            console.error("❌ Error in rating vendor:", error);
+            console.error("Error fetching vendor rating:", error);
             res.status(500).json({ message: "Internal server error." });
         }
     }

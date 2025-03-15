@@ -391,7 +391,7 @@ class CustomerController {
                 }
     
                 // ✅ Update distributor's total deliveries (MUST BE IN `User`, NOT `Distributor`)
-                await User.findByIdAndUpdate(assignedDistributor._id, {
+                await User.findByIdAndUpdate(assignedDistributor.user._id, {
                     $inc: { totalDeliveries: 1 }
                 });
     
@@ -433,7 +433,7 @@ class CustomerController {
                         totalAmount: finalAmount,
                         address: user.address,
                         deliveryStatus: 'assigned',
-                        assignedDistributor: assignedDistributor._id,
+                        assignedDistributor: assignedDistributor.user._id,
 
                         // ✅ Initialize vendor ratings as empty (to be updated later)
                         vendorRatings: itemsToPurchase.map(cartItem => ({
@@ -443,7 +443,36 @@ class CustomerController {
                     });
                     await purchase.save();
     
-                    await User.findByIdAndUpdate(assignedDistributor._id, {
+
+                    // new added such that stripe handles the delivery.
+                    // Update vendor quantities and profits
+                for (const cartItem of itemsToPurchase) {
+                    for (const allocation of cartItem.vendorAllocations) {
+                        const vendorItem = await Vendor.findOne({ 
+                            vendor: allocation.vendorId,
+                            itemName: cartItem.item.name
+                        });
+    
+                        if (vendorItem) {
+                            vendorItem.quantity -= allocation.quantity;
+                            vendorItem.quantitySold += allocation.quantity;
+                            vendorItem.profit += allocation.quantity * allocation.pricePerKg;
+                            await vendorItem.save();
+                        }
+    
+                        // Update main item quantity
+                        const item = await Item.findById(cartItem.item._id);
+                        if (item) {
+                            item.quantity -= allocation.quantity;
+                            if (item.quantity <= 0) {
+                                await Item.findByIdAndDelete(item._id);
+                            } else {
+                                await item.save();
+                            }
+                        }
+                    }
+                }
+                    await User.findByIdAndUpdate(assignedDistributor.user._id, {
                         $inc: { totalDeliveries: 1 }
                     });
     

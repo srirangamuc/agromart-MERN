@@ -52,12 +52,8 @@ router.get('/profit-data', async (req, res) => {
 });
 
 // Vendor rating route
-router.post("/rate-vendor", (req, res, next) => {
-    console.log("🔴 Rate Vendor API Hit");
-    console.log("Request Body:", req.body);
-    console.log("Request Headers:", req.headers);
-    next();
-}, authenticateUser, vendorController.rateVendor);
+router.post('/rate-vendor', authenticateUser, vendorController.rateVendor);
+router.get('/rating', vendorController.getVendorRating);
 
 
 module.exports = router;

@@ -50,6 +50,7 @@ const VendorDashboard = () => {
     pricePerKg: "",
   })
   const [error, setError] = useState(null)
+  const [rating, setRating] = useState(null);
   const [vendorProfile, setVendorProfile] = useState(null)
   const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [profileForm, setProfileForm] = useState({
@@ -102,7 +103,9 @@ const VendorDashboard = () => {
         const vendorResponse = await vendorService.getVendorDashboard()
         const vendorProfileResponse = await vendorService.fetchProfile()
         const profitResponse = await vendorService.getProfitData()
-
+        const rating = await vendorService.getVendorRating();
+        
+        setRating(rating);
         setVendorData(vendorResponse)
         setVendorProfile(vendorProfileResponse)
         setProfitData(profitResponse)
@@ -237,7 +240,11 @@ const VendorDashboard = () => {
           </div>
         </div>
       </aside>
-
+      <div className="p-4 border rounded-lg shadow-md bg-white w-64 text-center">
+            <h2 className="text-lg font-semibold">Vendor Rating</h2>
+            <p className="text-xl font-bold text-yellow-500">⭐ {rating.averageRating || "N/A"}</p>
+            <p className="text-sm text-gray-600">({rating.ratingCount} Reviews)</p>
+        </div>
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Header */}
