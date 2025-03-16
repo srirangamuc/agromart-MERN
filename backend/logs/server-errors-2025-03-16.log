@@ -9,3 +9,14 @@
     at writeOrBuffer (node:internal/streams/writable:564:12)
     at _write (node:internal/streams/writable:493:10)
     at Writable.write (node:internal/streams/writable:502:10)
+2025-03-16T19:16:21.361Z - SyntaxError: Unexpected number in JSON at position 1
+    at JSON.parse (<anonymous>)
+    at C:\Users\91949\OneDrive\Desktop\SEMS\SEM 5\FDFED\PROJECT\agromart-MERN\backend\routes\distributorRoutes.js:23:42
+    at Layer.handle [as handle_request] (C:\Users\91949\OneDrive\Desktop\SEMS\SEM 5\FDFED\PROJECT\agromart-MERN\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\91949\OneDrive\Desktop\SEMS\SEM 5\FDFED\PROJECT\agromart-MERN\backend\node_modules\express\lib\router\route.js:149:13)
+    at done (C:\Users\91949\OneDrive\Desktop\SEMS\SEM 5\FDFED\PROJECT\agromart-MERN\backend\node_modules\multer\lib\make-middleware.js:45:7)
+    at indicateDone (C:\Users\91949\OneDrive\Desktop\SEMS\SEM 5\FDFED\PROJECT\agromart-MERN\backend\node_modules\multer\lib\make-middleware.js:49:68)
+    at C:\Users\91949\OneDrive\Desktop\SEMS\SEM 5\FDFED\PROJECT\agromart-MERN\backend\node_modules\multer\lib\make-middleware.js:155:11
+    at WriteStream.<anonymous> (C:\Users\91949\OneDrive\Desktop\SEMS\SEM 5\FDFED\PROJECT\agromart-MERN\backend\node_modules\multer\storage\disk.js:43:9)
+    at WriteStream.emit (node:events:530:35)
+    at finish (node:internal/streams/writable:945:10)

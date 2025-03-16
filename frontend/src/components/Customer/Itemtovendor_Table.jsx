@@ -39,7 +39,7 @@ const ItemVendorTable = ({ itemName, onClose }) => {
                 await cartServices.addToCart(item.itemName, item.vendorId, item.quantity);
             }
 
-            console.log("Items added to cart, redirecting...");
+            // console.log("Items added to cart, redirecting...");
             window.location.href = '/cart';
         } catch (error) {
             console.error("Error adding items to cart:", error);

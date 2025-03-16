@@ -4,26 +4,26 @@ const Distributor = require("../models/distributorModel");
 const Purchase = require("../models/purchaseModel")
 
 exports.getDistributorDetails = async (req, res) => {
-    console.log("🔥 getDistributorDetails REACHED!");
+    // console.log("🔥 getDistributorDetails REACHED!");
 
     const distributorId = req.session.userId;
 
     if (!distributorId) {
-        console.log("🚨 ERROR: No session userId found");
+        // console.log("🚨 ERROR: No session userId found");
         return res.status(401).json({ message: "Not authenticated." });
     }
 
     try {
-        console.log("🔍 Looking for distributor with ID:", distributorId);
+        // console.log("🔍 Looking for distributor with ID:", distributorId);
 
         const distributor = await Distributor.findOne({ user: distributorId }).populate("user");
 
         if (!distributor || distributor.user.role !== "distributor") {
-            console.log("🚨 Distributor not found");
+            // console.log("🚨 Distributor not found");
             return res.status(404).json({ message: "Distributor details not found." });
         }
 
-        console.log("✅ Distributor Found:", distributor);
+        // console.log("✅ Distributor Found:", distributor);
 
         // ✅ Make sure profilePicture is included in the response
         res.status(200).json({
@@ -39,7 +39,7 @@ exports.getDistributorDetails = async (req, res) => {
             profilePicture: distributor.user.profilePicture || null,  // ✅ Ensure profilePicture is sent
         });
     } catch (error) {
-        console.error("❌ ERROR:", error);
+        // console.error("❌ ERROR:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
@@ -149,27 +149,27 @@ exports.getAssignedPurchases = async (req, res) => {
     }
 
     try {
-        console.log("🔍 Fetching distributor details for user ID:", distributorId);
+        // console.log("🔍 Fetching distributor details for user ID:", distributorId);
         
         // ✅ Fix: Ensure we are fetching distributor details correctly
         const distributor = await Distributor.findOne({ user: distributorId }).populate("user");
         if (!distributor) {
-            console.log("🚨 ERROR: No distributor found for user ID:", distributorId);
+            // console.log("🚨 ERROR: No distributor found for user ID:", distributorId);
             return res.status(404).json({ message: "Distributor not found." });
         }
 
-        console.log("✅ Distributor Exists:", distributor);
+        // console.log("✅ Distributor Exists:", distributor);
 
         // ✅ Fix: Ensure purchases are assigned correctly
         const purchases = await Purchase.find({ assignedDistributor: distributorId })
             .populate("user", "name email") 
             .populate("items.item", "name pricePerKg");
 
-        console.log("✅ Assigned Purchases Fetched:", purchases);
+        // console.log("✅ Assigned Purchases Fetched:", purchases);
 
         res.status(200).json(purchases);
     } catch (error) {
-        console.error("❌ Error fetching assigned purchases:", error);
+        // console.error("❌ Error fetching assigned purchases:", error);
         res.status(500).json({ message: "Server error." });
     }
 };
@@ -221,11 +221,11 @@ exports.updateDeliveryStatus = async (req, res) => {
 
 
 exports.rateDistributor = async (req, res) => {
-    console.log("Rating system entered");
+    // console.log("Rating system entered");
     try {
         const { purchaseId, rating } = req.body;
-        console.log("Purchase ID:", purchaseId);
-        console.log("Rating:", rating);
+        // console.log("Purchase ID:", purchaseId);
+        // console.log("Rating:", rating);
 
         // Validate rating
         if (rating < 1 || rating > 5) {

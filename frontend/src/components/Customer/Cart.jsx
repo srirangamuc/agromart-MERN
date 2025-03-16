@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Trash2, ShoppingCart, CreditCard, DollarSign } from 'lucide-react';
 import { cartServices } from "../../services/cartServices";
+import { toast } from "react-toastify";
 
 function Cart() {
     const [cartItems, setCartItems] = useState([]);
@@ -16,7 +17,7 @@ function Cart() {
         try {
             setIsLoading(true);
             const data = await cartServices.fetchCart();
-            console.log("Cart Data in Component:", data); // Log the data inside Cart.jsx
+            // console.log("Cart Data in Component:", data); // Log the data inside Cart.jsx
             setCartItems(data.cartItems || []); // Ensure state updates properly
             setTotalCartValue(Number(data.totalCartValue) || 0);
         } catch (error) {
@@ -29,7 +30,7 @@ function Cart() {
 
     const handleDelete = async (itemId, vendorId) => {
         try {
-            console.log(itemId,vendorId);
+            // console.log(itemId,vendorId);
             await cartServices.deleteFromCart(itemId, vendorId);  // Pass both values
             fetchCartData();  // Refresh cart after deletion
         } catch (error) {
@@ -45,7 +46,7 @@ function Cart() {
             if (paymentMethod === 'stripe') {
                 window.location.href = data.sessionUrl;
             } else {
-                alert("Checkout successful!");
+                toast.success("Checkout successful!");
             }
         } catch (error) {
             console.error("Error during checkout:", error);
@@ -119,7 +120,7 @@ function Cart() {
                                         </span>
                                         <button
                                         onClick={() => {
-                                            console.log("Clicked Delete for Item:", cartItem);
+                                            // console.log("Clicked Delete for Item:", cartItem);
                                             handleDelete(cartItem.itemId, cartItem.vendorId);
                                         }}
                                         className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition-colors"

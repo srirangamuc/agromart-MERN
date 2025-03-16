@@ -77,7 +77,7 @@ class CustomerController {
         try {
             const { vendorId, itemName, quantity } = req.body;
             const userId = req.session.userId;
-             console.log("Fetched data:", vendorId, itemName, quantity ) ;
+            //  console.log("Fetched data:", vendorId, itemName, quantity ) ;
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
             }
@@ -89,12 +89,12 @@ class CustomerController {
     
             // Fetch the item separately
             const item = await Item.findOne({ name: itemName });
-            console.log("Item:", item);
+            // console.log("Item:", item);
             if (!item) {
                 return res.status(404).json({ error: 'Item not found' });
             }
         var itemId = item._id;
-        console.log("Item Id:", itemId);
+        // console.log("Item Id:", itemId);
             // Fetch the vendor details
             const vendorItem = await Vendor.findById(vendorId);
             if (!vendorItem) {
@@ -116,9 +116,9 @@ class CustomerController {
             // Check if the same vendor-item pair already exists in the cart
            // Check if the same vendor-item pair already exists in the cart
             const existingCartItem = user.cart.find(cartItem => {
-                console.log("Cart Item:", cartItem.toString(), cartItem.item.toString(), cartItem.vendor.toString());
-                console.log("Item Id:", itemId.toString());
-                console.log("Vendor Id:", vendorId.toString());
+                // console.log("Cart Item:", cartItem.toString(), cartItem.item.toString(), cartItem.vendor.toString());
+                // console.log("Item Id:", itemId.toString());
+                // console.log("Vendor Id:", vendorId.toString());
                 // Prevent undefined property access
                 if (!cartItem.item || !cartItem.vendor) {
                     console.error("Cart item has undefined fields:", cartItem);
@@ -234,7 +234,7 @@ class CustomerController {
 
     async checkout(req, res) {
         const { paymentMethod } = req.body;
-        console.log("Fetched data:", req.body);
+        // console.log("Fetched data:", req.body);
     
         try {
             const user = await User.findById(req.session.userId).populate('cart.item');
@@ -247,7 +247,7 @@ class CustomerController {
                 !address.state || !address.country || !address.zipCode) {
                 return res.status(400).json({ error: 'Please provide a complete address before checkout.' });
             }
-            console.log(address.city)
+            // console.log(address.city)
     
             // ✅ Fetch available distributors from `User`, NOT `Distributor`
             const availableDistributors = await Distributor.find({
@@ -256,7 +256,7 @@ class CustomerController {
             
             const filteredDistributors = availableDistributors.filter(dist => dist.user.address.city === address.city);
             
-            console.log("✅ Available Distributors in City:", filteredDistributors);
+            // console.log("✅ Available Distributors in City:", filteredDistributors);
             
             if (!filteredDistributors.length) {
                 return res.status(400).json({ error: 'No available distributor in your city' });
@@ -267,7 +267,7 @@ class CustomerController {
                 Math.floor(Math.random() * filteredDistributors.length)
             ];
             
-            console.log("✅ Assigned Distributor:", assignedDistributor.user.name);
+            // console.log("✅ Assigned Distributor:", assignedDistributor.user.name);
             
     
             const itemsToPurchase = user.cart.filter(cartItem => cartItem.item);
@@ -325,7 +325,7 @@ class CustomerController {
             }
     
             const totalAmount = itemsToPurchase.reduce((total, cartItem) => {
-                return total + (cartItem.item.pricePerKg * cartItem.quantity * 1.5);
+                return total + (cartItem.pricePerKg * cartItem.quantity );//item.//* 1.5
             }, 0);
     
             let discount = 0;
@@ -518,10 +518,10 @@ await purchase.save();
 
     async updateProfile(req, res) {
         try {
-            console.log("📩 Received update-profile request");
+            // console.log("📩 Received update-profile request");
     
             const customerId = req.session.userId;
-            console.log("Session userId:", customerId);
+            // console.log("Session userId:", customerId);
             if (!customerId) {
                 return res.status(401).json({ error: "Unauthorized - User ID not found in session" });
             }
@@ -531,7 +531,7 @@ await purchase.save();
                 return res.status(404).json({ error: "Customer not found" });
             }
     
-            console.log("📝 Raw Request Body:", req.body);
+            // console.log("📝 Raw Request Body:", req.body);
     
             // Extract form data
             const { name, email, hno, street, city, state, zipCode, country } = req.body;
@@ -551,7 +551,7 @@ await purchase.save();
             customer.address.zipCode = zipCode || customer.address.zipCode;
             customer.address.country = country || customer.address.country;
     
-            console.log("📁 Uploaded file:", req.file);
+            // console.log("📁 Uploaded file:", req.file);
     
             // Handle profile picture upload
             if (req.file) {
@@ -562,7 +562,7 @@ await purchase.save();
     
                 // Update profile picture path
                 customer.profilePicture = `/uploads/${req.file.filename}`;
-                console.log(`📸 Uploaded File Path: ${customer.profilePicture}`);
+                // console.log(`📸 Uploaded File Path: ${customer.profilePicture}`);
             }
     
             // Save updated customer data
@@ -580,7 +580,7 @@ await purchase.save();
             });
     
         } catch (error) {
-            console.error("❌ Error updating profile:", error);
+            // console.error("❌ Error updating profile:", error);
             res.status(500).json({ error: "Failed to update profile" });
         }
     }
@@ -646,7 +646,7 @@ await purchase.save();
     
     async purchaseSubscription(req, res) {
         const { plan } = req.body; // 'pro' or 'pro plus'
-        console.log(plan)
+        // console.log(plan)
         const userId = req.session.userId;
     
         try {
@@ -660,7 +660,7 @@ await purchase.save();
                 amount = 59900; // ₹599 in paisa
             } else if (plan === 'pro plus') {
                 amount = 89900; // ₹899 in paisa
-                console.log("Choose Pro Plus")
+                // console.log("Choose Pro Plus")
             } else {
                 return res.status(400).json({ error: 'Invalid plan' });
             }

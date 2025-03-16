@@ -17,7 +17,7 @@ router.get('/get-cart', (req, res) => customerController.getCart(req, res));
 
 // Add Item to Cart - Debugging Logs Added
 router.post('/add-to-cart', (req, res) => {
-    console.log("POST /add-to-cart Request Body:", req.body);
+    // console.log("POST /add-to-cart Request Body:", req.body);
     customerController.addToCart(req, res);
 });
 // Delete an item from the cart

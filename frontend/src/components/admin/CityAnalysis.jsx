@@ -20,7 +20,7 @@ const UserStatsGraphs = () => {
 
     fetchData();
   }, []);
-  console.log(userData)
+  // console.log(userData)
   const cities = userData.map(entry => entry._id || "Unknown");
   const vendors = userData.map(entry => entry.vendors);
   const customers = userData.map(entry => entry.customers);

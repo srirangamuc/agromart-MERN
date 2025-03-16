@@ -55,7 +55,7 @@ class AdminController {
             let deliveryTotalRating = 0, deliveryCount = 0;
 
             deliveryGuys.forEach(delivery => {
-                console.log(delivery.averageRating)
+                // console.log(delivery.averageRating)
                 if(delivery.totalDeliveries){
                 deliveryTotalRating += delivery.averageRating;
                 deliveryCount++;
@@ -66,7 +66,7 @@ class AdminController {
                 else if (avg <=4) deliveryRatings['3-4']++;
                 else deliveryRatings['4-5']++;}
             });
-           console.log(vendorRatings,deliveryRatings)
+        //    console.log(vendorRatings,deliveryRatings)
             res.json({
                 vendorRatings,
                 vendorAvg: vendorCount ? (vendorTotalRating / vendorCount).toFixed(2) : "N/A",
@@ -128,7 +128,7 @@ class AdminController {
             vendorProfit.forEach(item => {
                 item.totalProfit = item.quantitySold * item.pricePerKg;
             });
-            console.log(vendorDetails, vendorStock, vendorProfit)
+            // console.log(vendorDetails, vendorStock, vendorProfit)
             res.json({ vendorDetails, vendorStock, vendorProfit });
         } catch (error) {
             console.error("Error fetching vendor details:", error);
@@ -217,7 +217,7 @@ class AdminController {
             }
         ]);
 
-        console.log(result); // Debugging log
+        // console.log(result); // Debugging log
 
         res.json(result);
     } catch (error) {
@@ -267,7 +267,7 @@ async getTopVendorEachYear(req, res) {
             }
         ]);
 
-        console.log(result); // Debugging log
+        // console.log(result); // Debugging log
 
         res.json(result);
     } catch (error) {
@@ -288,7 +288,7 @@ async getTopVendorEachYear(req, res) {
                 },
                 { $sort: { _id: 1 } } // Sort by city name
             ]);
-            console.log(userCounts)
+            // console.log(userCounts)
             res.status(200).json(userCounts);
         } catch (error) {
             res.status(500).json({ error: "Failed to fetch user counts", message: error.message });

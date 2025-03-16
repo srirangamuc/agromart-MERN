@@ -18,7 +18,7 @@ class VendorController {
         try {
             let { name, quantity, pricePerKg } = req.body;
             const vendorId = req.session.userId;
-            console.log(vendorId)
+            // console.log(vendorId)
 
             // Convert quantity and pricePerKg to numbers
             quantity = parseInt(quantity, 10);
@@ -123,11 +123,11 @@ class VendorController {
                 state,
                 country,
                 zipCode} = req.body;
-            console.log( username, password ,email,hno, street,
-                city,
-                state,
-                country,
-                zipCode)
+            // console.log( username, password ,email,hno, street,
+            //     city,
+            //     state,
+            //     country,
+            //     zipCode)
             const user = await User.findById(userId);
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
@@ -212,11 +212,11 @@ class VendorController {
 // New Method regarding Vendor Rating.
 // Function to rate vendor
 async rateVendor(req, res) {
-    console.log("Vendor rating system entered");
+    // console.log("Vendor rating system entered");
 
     try {
         const { purchaseId, vendorId, rating } = req.body;
-        console.log("Purchase ID:", purchaseId, "Vendor ID:", vendorId, "Rating:", rating);
+        // console.log("Purchase ID:", purchaseId, "Vendor ID:", vendorId, "Rating:", rating);
 
         if (rating < 1 || rating > 5) {
             return res.status(400).json({ message: "Rating must be between 1 and 5" });
@@ -237,7 +237,7 @@ async rateVendor(req, res) {
             return res.status(404).json({ message: "Vendor not found" });
         }
         let vendor_user=vendor.vendor;
-        console.log("Vendor User:",vendor_user);*/
+        // console.log("Vendor User:",vendor_user);*/
         // ✅ Initialize vendorRatings if missing
         if (!purchase.vendorRatings) {
             purchase.vendorRatings = [];
@@ -247,7 +247,7 @@ async rateVendor(req, res) {
         const existingRatingIndex = purchase.vendorRatings.findIndex((vr) => vr.vendor.toString() === vendorId);
         if (existingRatingIndex !== -1) {
             const oldRating = purchase.vendorRatings[existingRatingIndex].rating;
-            console.log(`Updating existing rating: ${oldRating} → ${rating}`);
+            // console.log(`Updating existing rating: ${oldRating} → ${rating}`);
 
             /*// Remove old rating contribution
             vendor.totalRatings -= oldRating;
@@ -256,7 +256,7 @@ async rateVendor(req, res) {
             // Update the rating in purchase.vendorRatings
             purchase.vendorRatings[existingRatingIndex].rating = rating;
         } else {
-            console.log(`🟢 New rating added: ${rating}`);
+            // console.log(`🟢 New rating added: ${rating}`);
 
             // Add new rating
             purchase.vendorRatings.push({ vendor: vendorId, rating });
@@ -264,7 +264,7 @@ async rateVendor(req, res) {
 
         // ✅ Save updated purchase
         await purchase.save();
-        console.log("✅ Purchase rating updated successfully!");
+        // console.log("✅ Purchase rating updated successfully!");
        
         let vendorRating = await VendorRating.findOne({ vendor: vendorId});
 
@@ -284,7 +284,7 @@ async rateVendor(req, res) {
         await vendorRating.save();
         res.json({ message: "Vendor rating submitted successfully.", averageRating: vendorRating.averageRating });
     } catch (error) {
-        console.error("❌ Error in rating vendor:", error);
+        // console.error("❌ Error in rating vendor:", error);
         res.status(500).json({ message: "Internal server error." });
     }
 }
@@ -293,13 +293,13 @@ async rateVendor(req, res) {
     async  getVendorRating(req, res) {
         try {
             const vendorId  =  req.session.userId;
-            console.log("Vendor ID:", vendorId);
+            // console.log("Vendor ID:", vendorId);
             const vendorRating = await VendorRating.findOne({ vendor: vendorId });
     
             if (!vendorRating) {
                 return res.json({ averageRating: 0, ratingCount:0 });;
             }
-           console.log("Vendor Rating:", vendorRating.averageRating, "Rating Count:", vendorRating.ratingCount,res);
+        //    console.log("Vendor Rating:", vendorRating.averageRating, "Rating Count:", vendorRating.ratingCount,res);
             res.json({ averageRating: vendorRating.averageRating, ratingCount: vendorRating.ratingCount });
         } catch (error) {
             console.error("Error fetching vendor rating:", error);

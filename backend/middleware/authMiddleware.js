@@ -23,12 +23,12 @@ const authenticateUser = (req, res, next) => {
 
     // ✅ If no token is found, fall back to session authentication
     if (req.session && req.session.userId) {
-        console.log("✅ Using session authentication:", req.session.userId);
+        // console.log("✅ Using session authentication:", req.session.userId);
         req.user = { id: req.session.userId, role: req.session.userRole };  // Simulate decoded JWT
         return next();
     }
 
-    console.log("🚨 No token or session found. Authorization denied.");
+    // console.log("🚨 No token or session found. Authorization denied.");
     return res.status(401).json({ message: "No token or session provided. Authorization denied." });
 };
 

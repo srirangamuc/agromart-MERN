@@ -62,7 +62,7 @@ const ProfilePage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
     
-        console.log("📤 FormData before sending:", formData);
+        // console.log("📤 FormData before sending:", formData);
     
         const formDataToSend = new FormData();
     
@@ -73,7 +73,7 @@ const ProfilePage = () => {
     
         // Debugging: Check FormData content
         for (const pair of formDataToSend.entries()) {
-            console.log(pair[0], pair[1]); // This should log each field properly
+            // console.log(pair[0], pair[1]); // This should log each field properly
         }
     
         try {

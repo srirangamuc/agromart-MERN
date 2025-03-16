@@ -146,10 +146,10 @@ app.use("/api/distributor", distributorRoutes);
 app.use(morgan(':custom')); // Console logging
 app.use(morgan(':file-format', { stream: accessLogStream })); // File logging
 
-app.use((req, res, next) => {
-    console.log("🟢 SESSION DATA:", req.session);
-    next();
-});
+// app.use((req, res, next) => {
+//     console.log("🟢 SESSION DATA:", req.session);
+//     next();
+// });
 
 
 // Custom error logger middleware

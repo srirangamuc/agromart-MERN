@@ -4,10 +4,10 @@ const distributorController = require('../controllers/distributorController');
 const authenticateUser = require("../middleware/authMiddleware")
 const upload = require('../middleware/multerConfig');
 
-router.use((req, res, next) => {
-    console.log(`📢 API REQUEST RECEIVED: ${req.method} ${req.url}`);
-    next();
-});
+// router.use((req, res, next) => {
+//     console.log(`📢 API REQUEST RECEIVED: ${req.method} ${req.url}`);
+//     next();
+// });
 
 
 router.get("/",authenticateUser,distributorController.getDistributorDetails);

@@ -14,7 +14,7 @@ const VendorDetails = ({ vendorId }) => {
     const fetchVendorDetails = async () => {
       try {
         const data = await adminService.getVendorDetails(vendorId);
-        console.log(data);
+        // console.log(data);
         setVendor(data);
       } catch (error) {
         console.error("Error fetching vendor details:", error);

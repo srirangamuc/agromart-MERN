@@ -292,7 +292,6 @@ const ProductsPage = () => {
                       <h2 className="text-lg font-semibold text-gray-800 group-hover:text-emerald-600 transition-colors">
                         {product.name}
                       </h2>
-                      <span className="text-lg font-bold text-emerald-600">₹{product.pricePerKg * 1.5}/kg</span>
                     </div>
 
                     <div className="text-sm text-gray-500 mb-4 flex items-center">

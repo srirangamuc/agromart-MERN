@@ -124,7 +124,7 @@ const DistributorDashboard = () => {
             }
 
             const data = await response.json();
-            console.log("Fetched Distributor Data:", data);  // ✅ Debugging log
+            // console.log("Fetched Distributor Data:", data);  // ✅ Debugging log
 
             setDistributor(data);
             setAvailable(data.available);
