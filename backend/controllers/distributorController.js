@@ -15,19 +15,38 @@ exports.getDistributorDetails = async (req, res) => {
 
     try {
         console.log("🔍 Looking for distributor with ID:", distributorId);
-        const distributor = await User.findById(distributorId);
-        if (!distributor || distributor.role !== "distributor") {
-            console.log("🚨 Distributor not found in User model");
+
+        const distributor = await Distributor.findOne({ user: distributorId }).populate("user");
+
+        if (!distributor || distributor.user.role !== "distributor") {
+            console.log("🚨 Distributor not found");
             return res.status(404).json({ message: "Distributor details not found." });
         }
 
         console.log("✅ Distributor Found:", distributor);
-        res.status(200).json(distributor);
+
+        // ✅ Make sure profilePicture is included in the response
+        res.status(200).json({
+            name: distributor.user.name,
+            email: distributor.user.email,
+            contactPhone: distributor.contactPhone,
+            address: distributor.user.address,
+            available: distributor.available,
+            totalDeliveries: distributor.totalDeliveries,
+            ratingCount: distributor.ratingCount,
+            totalRatings: distributor.totalRatings,
+            averageRating: distributor.averageRating,
+            profilePicture: distributor.user.profilePicture || null,  // ✅ Ensure profilePicture is sent
+        });
     } catch (error) {
         console.error("❌ ERROR:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
+
+
+
+
 
 
 
@@ -76,8 +95,9 @@ exports.updateDistributorInfo = async (req, res) => {
 
     try {
         const { contactPhone, address } = req.body;
+        const profilePicture = req.file ? `/uploads/${req.file.filename}` : null;
 
-        // Update the User model for the address
+        // Update the User model for address & profile picture
         const user = await User.findById(distributorId);
         if (!user || user.role !== "distributor") {
             return res.status(404).json({ message: "Distributor not found or unauthorized." });
@@ -93,9 +113,12 @@ exports.updateDistributorInfo = async (req, res) => {
                 zipCode: address.zipCode || user.address.zipCode
             };
         }
+
+        if (profilePicture) user.profilePicture = profilePicture;
+
         await user.save();
 
-        // Update the Distributor model for the contactPhone
+        // Update the Distributor model for contactPhone
         const distributor = await Distributor.findOne({ user: distributorId });
         if (!distributor) {
             return res.status(404).json({ message: "Distributor details not found." });
@@ -107,13 +130,15 @@ exports.updateDistributorInfo = async (req, res) => {
         res.status(200).json({
             message: "Distributor information updated successfully.",
             contactPhone: distributor.contactPhone,
-            address: user.address
+            address: user.address,
+            profilePicture: user.profilePicture
         });
     } catch (error) {
         console.error("Error updating distributor info:", error);
         res.status(500).json({ message: "Server error." });
     }
 };
+
 
 
 exports.getAssignedPurchases = async (req, res) => {
@@ -249,7 +274,7 @@ exports.rateDistributor = async (req, res) => {
     }
 };
 
-exports.getDistributorDetails = async (req, res) => {
+/*exports.getDistributorDetails = async (req, res) => {
     const distributorId = req.session.userId;
 
     if (!distributorId) {
@@ -283,7 +308,7 @@ exports.getDistributorDetails = async (req, res) => {
         console.error("Error fetching distributor details:", error);
         res.status(500).json({ message: "Server error" });
     }
-};
+};*/
 
 
 /*exports.getDistributorDetails = async (req, res) => {

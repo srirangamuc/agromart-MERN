@@ -61,37 +61,33 @@ const ProfilePage = () => {
     // updated handle submit method .
     const handleSubmit = async (e) => {
         e.preventDefault();
-         
-        if (!formData.name) {
-            setError("Name is required");
-            return;
-        }
-        console.log("hello",formData)
+    
+        console.log("📤 FormData before sending:", formData);
+    
         const formDataToSend = new FormData();
-
-        console.log("📤 FormData Contents Before Sending:");
-        
-        for (const key in formData) {
-            if (formData[key]) { // ✅ Prevent empty values
-                formDataToSend.append(key, formData[key]);
-            }
-        }
-        console.log("📤 FormData Contents Before Sending:");
+    
+        // Append all fields, even if they are empty
+        Object.entries(formData).forEach(([key, value]) => {
+            formDataToSend.append(key, value || ""); // ✅ Ensures empty fields are sent
+        });
+    
+        // Debugging: Check FormData content
         for (const pair of formDataToSend.entries()) {
-            console.log(pair[0], pair[1]); // This should show the file and other fields
+            console.log(pair[0], pair[1]); // This should log each field properly
         }
-
+    
         try {
             const updatedProfile = await userService.updateProfile(formDataToSend);
             setSuccess(updatedProfile.success);
             setError(null);
-            setUserProfile({ ...userProfile, profilePicture: updatedProfile.profilePicture });
+            setUserProfile({ ...userProfile, ...updatedProfile.user });
             setIsEditing(false);
         } catch (error) {
             setError(error.message);
             setSuccess(null);
         }
     };
+    
     
     
 

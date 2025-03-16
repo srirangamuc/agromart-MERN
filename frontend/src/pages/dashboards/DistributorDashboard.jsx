@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux"
 import { logout } from "../../redux/authSlice" // Adjust this import path as needed
 
 const DistributorDashboard = () => {
+  const[profilePicture, setProfilePicture] = useState(null);
   const [distributor, setDistributor] = useState(null)
   const [available, setAvailable] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -111,37 +112,43 @@ const DistributorDashboard = () => {
 
   useEffect(() => {
     const fetchDistributor = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/distributor", {
-          method: "GET",
-          credentials: "include", // REQUIRED to send cookies
-          headers: { "Content-Type": "application/json" },
-        })
+        try {
+            const response = await fetch("http://localhost:5000/api/distributor", {
+                method: "GET",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+            });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch distributor details.")
+            if (!response.ok) {
+                throw new Error("Failed to fetch distributor details.");
+            }
+
+            const data = await response.json();
+            console.log("Fetched Distributor Data:", data);  // ✅ Debugging log
+
+            setDistributor(data);
+            setAvailable(data.available);
+
+            // ✅ Safely check if profilePicture exists inside user
+            if (data?.user?.profilePicture) {
+                setProfilePicture(`http://localhost:5000${data.user.profilePicture}`);
+            } else {
+                setProfilePicture(null);
+            }
+        } catch (err) {
+            console.error("Fetch Error:", err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
         }
+    };
 
-        const data = await response.json()
-        setDistributor(data)
-        setAvailable(data.available)
+    fetchDistributor();
+}, []);
 
-        // Parse address fields
-        const addressFields = parseAddressToFormData(data.address)
 
-        setFormData({
-          contactPhone: data.contactPhone || "",
-          ...addressFields,
-        })
-      } catch (err) {
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
 
-    fetchDistributor()
-  }, [])
+
 
   const handleLogout = () => {
     dispatch(logout())
@@ -182,52 +189,61 @@ const DistributorDashboard = () => {
   }
 
   const handleUpdateSubmit = async (e) => {
-    e.preventDefault()
-    setFormError("")
-    setFormSuccess("")
+    e.preventDefault(); // Prevent default form submission
+    setUpdating(true);
+    setFormError("");
+    setFormSuccess("");
 
     try {
-      setUpdating(true)
+        const formDataToSend = new FormData();
 
-      // Prepare address object
-      const addressObj = {
-        hno: formData.hno,
-        street: formData.street,
-        city: formData.city,
-        state: formData.state,
-        country: formData.country,
-        zipCode: formData.zipCode,
-      }
+        // Append contact phone
+        formDataToSend.append("contactPhone", formData.contactPhone);
 
-      const response = await fetch("http://localhost:5000/api/distributor/update-info", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contactPhone: formData.contactPhone,
-          address: addressObj,
-        }),
-      })
+        // Append address as JSON string
+        formDataToSend.append("address", JSON.stringify({
+            hno: formData.hno,
+            street: formData.street,
+            city: formData.city,
+            state: formData.state,
+            country: formData.country,
+            zipCode: formData.zipCode
+        }));
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || "Failed to update information.")
-      }
+        // Append profile picture if selected
+        if (profilePicture instanceof File) {
+            formDataToSend.append("profilePicture", profilePicture);
+        }
 
-      const updatedData = await response.json()
-      setDistributor({
-        ...distributor,
-        contactPhone: updatedData.contactPhone,
-        address: updatedData.address,
-      })
-      setFormSuccess("Information updated successfully!")
-      setIsEditing(false)
+        const response = await fetch("http://localhost:5000/api/distributor/update-info", {
+            method: "POST",
+            credentials: "include",
+            body: formDataToSend
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || "Failed to update distributor details.");
+        }
+
+        setFormSuccess("Distributor information updated successfully!");
+        
+        // Update state with new data
+        setDistributor((prev) => ({
+            ...prev,
+            contactPhone: data.contactPhone,
+            address: data.address,
+            profilePicture: `http://localhost:5000${data.profilePicture}`
+        }));
+
     } catch (err) {
-      setFormError(err.message)
+        setFormError(err.message);
     } finally {
-      setUpdating(false)
+        setUpdating(false);
     }
-  }
+  };
+  
+
 
   useEffect(() => {
     const fetchAssignedPurchases = async () => {
@@ -332,7 +348,25 @@ const DistributorDashboard = () => {
           <div className="bg-blue-600 p-6 text-white">
             <div className="flex flex-col md:flex-row md:items-center">
               <div className="flex items-center mb-4 md:mb-0">
-                <User className="h-10 w-10 mr-4" />
+              <div className="relative h-16 w-16 rounded-full overflow-hidden border-2 border-white mr-4 flex items-center justify-center bg-gray-300">
+                {distributor?.profilePicture ? (
+                  <img
+                    src={`http://localhost:5000${distributor.profilePicture}`} // Ensure correct path
+                    alt="Profile"
+                    className="h-16 w-16 rounded-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/default-profile.png"; // Fallback to default
+                    }}
+                  />
+                ) : (
+                  <User className="h-10 w-10 text-gray-500" />
+                )}
+              </div>
+
+
+
+
                 <div>
                   <h1 className="text-2xl font-bold">Welcome, {distributor.name}!</h1>
                   <div className="flex flex-col mt-1">
@@ -441,6 +475,18 @@ const DistributorDashboard = () => {
                     placeholder="Enter your contact phone number"
                   />
                 </div>
+
+
+                {/* Profile Picture Upload (New) */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Profile Picture</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setProfilePicture(e.target.files[0])}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
 
                 <div className="mb-6">
                   <h3 className="block text-sm font-medium text-gray-700 mb-3">Address Information</h3>

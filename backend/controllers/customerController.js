@@ -531,27 +531,38 @@ await purchase.save();
                 return res.status(404).json({ error: "Customer not found" });
             }
     
+            console.log("📝 Raw Request Body:", req.body);
+    
             // Extract form data
-            const { name, email } = req.body;
+            const { name, email, hno, street, city, state, zipCode, country } = req.body;
+    
             if (name) customer.name = name;
             if (email) customer.email = email;
     
-            console.log("📝 Updated details:", req.body);
+            if (!customer.address) {
+                customer.address = {}; // Initialize if null
+            }
+    
+            // Update Address
+            customer.address.hno = hno || customer.address.hno;
+            customer.address.street = street || customer.address.street;
+            customer.address.city = city || customer.address.city;
+            customer.address.state = state || customer.address.state;
+            customer.address.zipCode = zipCode || customer.address.zipCode;
+            customer.address.country = country || customer.address.country;
+    
             console.log("📁 Uploaded file:", req.file);
     
             // Handle profile picture upload
             if (req.file) {
                 const allowedTypes = ["image/png", "image/jpg", "image/jpeg"];
-                
-                // Check file type
                 if (!allowedTypes.includes(req.file.mimetype)) {
                     return res.status(400).json({ error: "Invalid file type. Only PNG, JPG, and JPEG are allowed." });
                 }
     
                 // Update profile picture path
-                const imagePath = `/uploads/${req.file.filename}`;
-                customer.profilePicture = imagePath;
-                console.log(`📸 Uploaded File Path: ${imagePath}`);
+                customer.profilePicture = `/uploads/${req.file.filename}`;
+                console.log(`📸 Uploaded File Path: ${customer.profilePicture}`);
             }
     
             // Save updated customer data
@@ -563,7 +574,8 @@ await purchase.save();
                 user: {
                     name: customer.name,
                     email: customer.email,
-                    profilePicture: customer.profilePicture
+                    address: customer.address,
+                    profilePicture: customer.profilePicture,
                 }
             });
     
@@ -572,6 +584,7 @@ await purchase.save();
             res.status(500).json({ error: "Failed to update profile" });
         }
     }
+    
     
     
     async getProfile(req, res) {

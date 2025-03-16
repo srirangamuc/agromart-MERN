@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const distributorController = require('../controllers/distributorController');
 const authenticateUser = require("../middleware/authMiddleware")
+const upload = require('../middleware/multerConfig');
 
 router.use((req, res, next) => {
     console.log(`📢 API REQUEST RECEIVED: ${req.method} ${req.url}`);
@@ -11,7 +12,25 @@ router.use((req, res, next) => {
 
 router.get("/",authenticateUser,distributorController.getDistributorDetails);
 router.post('/update-availability', authenticateUser ,distributorController.updateAvailability);
-router.post("/update-info",authenticateUser,distributorController.updateDistributorInfo)
+
+router.post(
+    "/update-info",
+    authenticateUser,
+    upload.single("profilePicture"), // Multer middleware
+    (req, res, next) => {
+        // Ensure body fields are correctly parsed
+        if (req.body.contactPhone) {
+            req.body.contactPhone = JSON.parse(req.body.contactPhone);
+        }
+        if (req.body.address) {
+            req.body.address = JSON.parse(req.body.address);
+        }
+        next();
+    },
+    distributorController.updateDistributorInfo
+);
+
+
 router.get("/assigned-purchases",authenticateUser,distributorController.getAssignedPurchases)
 router.post("/update-delivery-status",authenticateUser,distributorController.updateDeliveryStatus)
 

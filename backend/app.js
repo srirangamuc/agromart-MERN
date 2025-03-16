@@ -29,9 +29,10 @@ dotenv.config();
 const upload = multer({ dest: "uploads/" });
 
 // Middleware
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json()); // Parse JSON requests
-app.use(express.json()); 
+ // Parse JSON requests
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // This helps with JSON payloads
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(cors({ origin: "http://localhost:5173", credentials: true }));
