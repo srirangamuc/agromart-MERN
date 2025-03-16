@@ -5,45 +5,43 @@ export const userService = {
   // Fetch user profile data
   async fetchProfile() {
     try {
-      const response = await fetch(`${BASE_URL}/profile`, {
-        method: 'GET',
-        credentials: 'include',
-      });
-      console.log(response)
+        const response = await fetch(`${BASE_URL}/profile`, {
+            method: 'GET',
+            credentials: 'include',
+        });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch user profile');
-      }
+        if (!response.ok) {
+            throw new Error('Failed to fetch user profile');
+        }
 
-      return await response.json(); // Return profile data
+        return await response.json();
     } catch (error) {
-      console.error('Error fetching profile:', error.message);
-      throw new Error('Failed to fetch profile. Please try again.');
+        console.error('Error fetching profile:', error.message);
+        throw new Error('Failed to fetch profile. Please try again.');
     }
-  },
+},
 
-  // Update user profile data
-  async updateProfile(profileData) {
+async updateProfile(profileData) {
     try {
-      const response = await fetch(`${BASE_URL}/update-profile`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(profileData), // Send profile data to backend
-      });
+        const response = await fetch(`${BASE_URL}/update-profile`, {
+            method: "POST",
+            credentials: "include",
+            body: profileData, // FormData object
+        });
 
-      if (!response.ok) {
-        throw new Error('Failed to update profile');
-      }
+        if (!response.ok) {
+            throw new Error(`Failed to update profile: ${await response.text()}`);
+        }
 
-      return await response.json(); // Return success message
+        return await response.json();
     } catch (error) {
-      console.error('Error updating profile:', error.message);
-      throw new Error('Failed to update profile. Please try again.');
+        console.error("❌ Error updating profile:", error);
+        throw new Error("Failed to update profile");
     }
-  },
+},
+
+
+
 
   // Handle other actions like purchasing subscriptions, etc.
   async purchaseSubscription(plan) {

@@ -1,0 +1,11 @@
+2025-03-16T09:45:16.286Z - MulterError: File too large
+    at abortWithCode (C:\Users\91949\OneDrive\Desktop\SEMS\SEM 5\FDFED\PROJECT\agromart-MERN\backend\node_modules\multer\lib\make-middleware.js:71:22)
+    at FileStream.<anonymous> (C:\Users\91949\OneDrive\Desktop\SEMS\SEM 5\FDFED\PROJECT\agromart-MERN\backend\node_modules\multer\lib\make-middleware.js:134:11)
+    at FileStream.emit (node:events:518:28)
+    at SBMH.ssCb [as _cb] (C:\Users\91949\OneDrive\Desktop\SEMS\SEM 5\FDFED\PROJECT\agromart-MERN\backend\node_modules\busboy\lib\types\multipart.js:479:32)
+    at feed (C:\Users\91949\OneDrive\Desktop\SEMS\SEM 5\FDFED\PROJECT\agromart-MERN\backend\node_modules\streamsearch\lib\sbmh.js:248:10)
+    at SBMH.push (C:\Users\91949\OneDrive\Desktop\SEMS\SEM 5\FDFED\PROJECT\agromart-MERN\backend\node_modules\streamsearch\lib\sbmh.js:104:16)
+    at Multipart._write (C:\Users\91949\OneDrive\Desktop\SEMS\SEM 5\FDFED\PROJECT\agromart-MERN\backend\node_modules\busboy\lib\types\multipart.js:567:19)
+    at writeOrBuffer (node:internal/streams/writable:564:12)
+    at _write (node:internal/streams/writable:493:10)
+    at Writable.write (node:internal/streams/writable:502:10)

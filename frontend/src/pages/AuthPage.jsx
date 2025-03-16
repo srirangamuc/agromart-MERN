@@ -54,39 +54,44 @@ const AuthPage = ({ onClose }) => {
   };
   
   const handleSignup = () => {
+    
     if (!name || !email || !password) {
-      toast.error("All fields are required");
-      return;
+        toast.error("All fields are required");
+        return;
     }
-  
+
     registerUser(name, email, password, role, dispatch)
-      .then((response) => {
-        if (response.user) {
-          toast.success("Signup successful!");
-          setIsLogin(true);
-        }
-      })
-      .catch((error) => {
-        if (error.response) {
-          switch (error.response.status) {
-            case 400:
-              toast.error("All fields are required");
-              break;
-            case 409:
-              toast.error("Email already exists");
-              break;
-            case 500:
-              toast.error("Server error. Please try again later");
-              break;
-            default:
-              toast.error("Signup failed. Please try again");
-          }
-        } else {
-          toast.error("Network error. Please check your connection");
-        }
-        console.error("Signup error:", error);
-      });
-  };
+        .then((response) => {
+            if (response && response.user) {  // ✅ Check response validity
+                toast.success("Signup successful!");
+                setIsLogin(true);
+            } else {
+                
+              toast.error(response?.message || "Signup failed. Please try again.");
+            }
+        })
+        .catch((error) => {
+            if (error.response) {
+                switch (error.response.status) {
+                    case 400:
+                        toast.error("All fields are required");
+                        break;
+                    case 409:
+                        toast.error("Email already exists");
+                        break;
+                    case 500:
+                        toast.error("Server error. Please try again later");
+                        break;
+                    default:
+                        toast.error("Signup failed. Please try again.");
+                }
+            } else {
+                toast.error("Network error. Please check your connection.");
+            }
+            console.error("Signup error:", error);
+        });
+};
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">

@@ -12,6 +12,8 @@ const csrf = require("csurf");
 const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
+const multer = require('multer');
+
 const vendorRoutes = require('./routes/vendorRoutes');
 const customerRoutes = require('./routes/customerRoutes');
 const adminRoutes = require("./routes/adminRoutes");
@@ -21,6 +23,28 @@ const app = express();
 
 // Load environment variables
 dotenv.config();
+
+
+// Middleware
+const upload = multer({ dest: "uploads/" });
+
+// Middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json()); // Parse JSON requests
+app.use(express.json()); 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cookieParser());
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET || "secretkey",
+        resave: false,
+        saveUninitialized: false,
+        cookie: { maxAge: 86400000, httpOnly: true, secure: false },
+    })
+);
+
 
 // Create logs directory if it doesn't exist
 const logDirectory = path.join(__dirname, 'logs');
@@ -151,6 +175,7 @@ app.use((req, res, next) => {
 
 // Static files and view engine setup
 app.use(express.static('public'));
+app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Serve uploaded files
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI || "mongodb+srv://freshmart:FDWyAmiXk89asnNd@freshmart.mtbq8.mongodb.net/farmer")

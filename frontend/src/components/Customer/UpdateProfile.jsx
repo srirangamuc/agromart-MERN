@@ -20,6 +20,7 @@ const ProfilePage = () => {
         state: '',
         zipCode: '',
         country: '',
+        profilePicture:null,// Add new line.
     });
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
@@ -40,6 +41,7 @@ const ProfilePage = () => {
                     state: profile.address.state,
                     zipCode: profile.address.zipCode,
                     country: profile.address.country,
+                    profilePicture: profile.profilePicture||null,
                 });
             } catch (error) {
                 setError(error.message);
@@ -56,19 +58,42 @@ const ProfilePage = () => {
         }));
     };
 
+    // updated handle submit method .
     const handleSubmit = async (e) => {
         e.preventDefault();
+         
+        if (!formData.name) {
+            setError("Name is required");
+            return;
+        }
+        console.log("hello",formData)
+        const formDataToSend = new FormData();
+
+        console.log("📤 FormData Contents Before Sending:");
+        
+        for (const key in formData) {
+            if (formData[key]) { // ✅ Prevent empty values
+                formDataToSend.append(key, formData[key]);
+            }
+        }
+        console.log("📤 FormData Contents Before Sending:");
+        for (const pair of formDataToSend.entries()) {
+            console.log(pair[0], pair[1]); // This should show the file and other fields
+        }
 
         try {
-            const updatedProfile = await userService.updateProfile(formData);
+            const updatedProfile = await userService.updateProfile(formDataToSend);
             setSuccess(updatedProfile.success);
             setError(null);
+            setUserProfile({ ...userProfile, profilePicture: updatedProfile.profilePicture });
             setIsEditing(false);
         } catch (error) {
             setError(error.message);
             setSuccess(null);
         }
     };
+    
+    
 
     if (!userProfile) {
         return (
@@ -285,6 +310,50 @@ const ProfilePage = () => {
                             </div>
                         </div>
                     </div>
+                    {/* Profile Picture Upload */}
+                    <div>
+                        <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                            <User className="w-6 h-6 mr-3 text-green-500" />
+                            Profile Picture
+                        </h3>
+                        {userProfile.profilePicture && (
+                            <div className="flex justify-center mb-4">
+                                <img 
+                                    src={`http://localhost:5000${userProfile.profilePicture}`} 
+                                    alt="Profile"
+                                    className="w-40 h-40 object-cover rounded-full border-4 border-green-300 shadow-md"
+                                />
+                            </div>
+                        )}
+
+
+                            <div className="flex flex-col items-center">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Upload Profile Picture</label>
+                                <input 
+                                    type="file" 
+                                    name="profilePicture" 
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        if (e.target.files.length > 0) {
+                                            setFormData({ ...formData, profilePicture: e.target.files[0] });
+                                        }
+                                    }}
+                                    className="hidden"
+                                    id="fileUpload"
+                                />
+                                <label 
+                                    htmlFor="fileUpload"
+                                    className="cursor-pointer bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300"
+                                >
+                                    Choose File
+                                </label>
+                            </div>
+
+
+
+
+                    </div>
+
 
                     {/* Submit Button */}
                     {isEditing && (

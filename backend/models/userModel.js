@@ -39,7 +39,8 @@ const userSchema = new mongoose.Schema({
         state: { type: String, default : null },
         country:{type:String, default : null},
         zipCode: { type: String, default : null }
-    }
+    },
+    profilePicture: {type: String, default:null} // new field.
 });
 
 // Create the model from the schema

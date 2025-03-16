@@ -226,18 +226,18 @@ async rateVendor(req, res) {
         if (!purchase || purchase.status !== "completed") {
             return res.status(400).json({ message: "You can rate only after purchase is completed" });
         }
-
+         /*
         const purchasedFromVendor = purchase.items.some((item) => item.vendor?.toString() === vendorId.toString());
         if (!purchasedFromVendor) {
             return res.status(400).json({ message: "Vendor not found in this purchase" });
-        }
+        }*/
 
-        const vendor = await Vendor.findById(vendorId);
+        /*const vendor = await Vendor.findById(vendorId);
         if (!vendor) {
             return res.status(404).json({ message: "Vendor not found" });
         }
         let vendor_user=vendor.vendor;
-        console.log("Vendor User:",vendor_user);
+        console.log("Vendor User:",vendor_user);*/
         // ✅ Initialize vendorRatings if missing
         if (!purchase.vendorRatings) {
             purchase.vendorRatings = [];
@@ -249,9 +249,9 @@ async rateVendor(req, res) {
             const oldRating = purchase.vendorRatings[existingRatingIndex].rating;
             console.log(`Updating existing rating: ${oldRating} → ${rating}`);
 
-            // Remove old rating contribution
+            /*// Remove old rating contribution
             vendor.totalRatings -= oldRating;
-            vendor.ratingCount -= 1;
+            vendor.ratingCount -= 1;*/
 
             // Update the rating in purchase.vendorRatings
             purchase.vendorRatings[existingRatingIndex].rating = rating;
@@ -266,11 +266,11 @@ async rateVendor(req, res) {
         await purchase.save();
         console.log("✅ Purchase rating updated successfully!");
        
-        let vendorRating = await VendorRating.findOne({ vendor: vendor_user});
+        let vendorRating = await VendorRating.findOne({ vendor: vendorId});
 
         if (!vendorRating) {
             vendorRating = new VendorRating({
-                vendor: vendor_user,
+                vendor: vendorId,
                 ratingCount: 1,
                 totalRatings: rating,
                 averageRating: rating,

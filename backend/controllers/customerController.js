@@ -2,7 +2,7 @@ const User = require('../models/userModel');
 const Purchase = require('../models/purchaseModel');
 const Item = require('../models/itemModel');
 const bcrypt = require('bcrypt');
-
+const upload = require('../middleware/multerConfig');
 const STRIPE_SECRET_KEY = 'sk_test_51Q1BEGDvKfDjvcpCsEqOVgaKLyoDU660JD41lqYzQU3G9KUsvFmcDiJ72dLMexorHUr4rC91KPBmMeiJxDZlpgru00gDvBILze';
 const stripe = require('stripe')(STRIPE_SECRET_KEY);
 const Vendor = require('../models/vendorModel')
@@ -339,28 +339,49 @@ class CustomerController {
     
             if (paymentMethod === 'COD') {
                 // Create purchase record
-                const purchase = new Purchase({
-                    user: user._id,
-                    items: itemsToPurchase.map(cartItem => ({
-                        item: cartItem.item._id,
-                        vendor: cartItem.vendor._id,
-                        name: cartItem.item.name,
-                        quantity: cartItem.quantity,
-                        pricePerKg: cartItem.item.pricePerKg
-                    })),
-                    purchaseDate: new Date(),
-                    status: 'received',
-                    totalAmount: finalAmount,
-                    address: user.address,
-                    deliveryStatus: 'assigned',
-                    assignedDistributor: assignedDistributor.user._id,
-                    // new one
-                    vendorRatings: itemsToPurchase.map(cartItem => ({
-                        vendor: cartItem.vendor, // Fetch vendor from cart
-                        rating: null // Rating will be added later
-                    }))
-                });
-                await purchase.save();
+// Create a unique vendors map
+                        const uniqueVendors = new Map();
+
+                        // Process vendors asynchronously
+                        await Promise.all(
+                            itemsToPurchase.map(async (cartItem) => {
+                                const vendor = await Vendor.findById(cartItem.vendor);
+                                
+                                if (vendor && !uniqueVendors.has(vendor.vendor.toString())) {
+                                    const vendorUser = await User.findById(vendor.vendor); // Get vendor's user details
+                                    uniqueVendors.set(vendor.vendor.toString(), {
+                                        vendorName: vendorUser?.name || "Unknown Vendor", // Ensure vendor name exists
+                                        vendor: vendor.vendor, // Store vendor ID
+                                        rating: null // Rating will be added later
+                                    });
+                                }
+                            })
+                        );
+
+                        // Convert unique vendors map to an array
+                        const vendorRatings = Array.from(uniqueVendors.values());
+
+                        const purchase = new Purchase({
+                            user: user._id,
+                            items: itemsToPurchase.map(cartItem => ({
+                                item: cartItem.item._id,
+                                vendor: cartItem.vendor._id,
+                                name: cartItem.item.name,
+                                quantity: cartItem.quantity,
+                                pricePerKg: cartItem.item.pricePerKg
+                            })),
+                            purchaseDate: new Date(),
+                            status: 'received',
+                            totalAmount: finalAmount,
+                            address: user.address,
+                            deliveryStatus: 'assigned',
+                            assignedDistributor: assignedDistributor.user._id,
+                            // Use unique vendor ratings
+                            vendorRatings: vendorRatings
+                        });
+
+await purchase.save();
+
     
                 // Update vendor quantities and profits
                 for (const cartItem of itemsToPurchase) {
@@ -497,58 +518,83 @@ class CustomerController {
 
     async updateProfile(req, res) {
         try {
+            console.log("📩 Received update-profile request");
+    
+            const customerId = req.session.userId;
+            console.log("Session userId:", customerId);
+            if (!customerId) {
+                return res.status(401).json({ error: "Unauthorized - User ID not found in session" });
+            }
+    
+            const customer = await User.findById(customerId);
+            if (!customer) {
+                return res.status(404).json({ error: "Customer not found" });
+            }
+    
+            // Extract form data
+            const { name, email } = req.body;
+            if (name) customer.name = name;
+            if (email) customer.email = email;
+    
+            console.log("📝 Updated details:", req.body);
+            console.log("📁 Uploaded file:", req.file);
+    
+            // Handle profile picture upload
+            if (req.file) {
+                const allowedTypes = ["image/png", "image/jpg", "image/jpeg"];
+                
+                // Check file type
+                if (!allowedTypes.includes(req.file.mimetype)) {
+                    return res.status(400).json({ error: "Invalid file type. Only PNG, JPG, and JPEG are allowed." });
+                }
+    
+                // Update profile picture path
+                const imagePath = `/uploads/${req.file.filename}`;
+                customer.profilePicture = imagePath;
+                console.log(`📸 Uploaded File Path: ${imagePath}`);
+            }
+    
+            // Save updated customer data
+            await customer.save();
+    
+            res.status(200).json({
+                success: true,
+                message: "Profile updated successfully",
+                user: {
+                    name: customer.name,
+                    email: customer.email,
+                    profilePicture: customer.profilePicture
+                }
+            });
+    
+        } catch (error) {
+            console.error("❌ Error updating profile:", error);
+            res.status(500).json({ error: "Failed to update profile" });
+        }
+    }
+    
+    
+    async getProfile(req, res) {
+        try {
             const userId = req.session.userId;
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
             }
-
-            const { name, password, hno, street, city, state, zipCode, country } = req.body;
-
-            const user = await User.findById(userId);
+    
+            const user = await User.findById(userId).select('-password');
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
             }
-
-            if (password) {
-                const salt = await bcrypt.genSalt(10);
-                user.password = await bcrypt.hash(password, salt);
-            }
-
-            user.name = name;
-            user.address = { hno, street, city, state, zipCode, country };
-
-            await user.save();
-            console.log("Profile updated successfully");
-            res.json({ success: 'Profile updated successfully' });
+    
+            res.json({
+                name: user.name,
+                email: user.email,
+                address: user.address,
+                profilePicture: user.profilePicture || null
+            });
         } catch (error) {
-            console.error("Update profile error:", error);
+            console.error("Get profile error:", error);
             return res.status(500).json({ error: 'Something went wrong. Please try again.' });
-        }
-    }
-    async getProfile(req, res) {
-        try {
-          const userId = req.session.userId; // Get the userId from the session
-      
-          if (!userId) {
-            return res.status(401).json({ error: 'User not authenticated' }); // Handle unauthenticated users
-          }
-      
-          // Find the user by userId in the database
-          const user = await User.findById(userId).select('-password'); // Don't include the password in the response
-      
-          if (!user) {
-            return res.status(404).json({ error: 'User not found' }); // Handle case where user does not exist
-          }
-      
-          // Return the user profile information
-          res.json({
-            name: user.name,
-            email: user.email,
-            address: user.address,
-          });
-        } catch (error) {
-          console.error("Get profile error:", error);
-          return res.status(500).json({ error: 'Something went wrong. Please try again.' }); // General error handling
         }
       }
     async logout(req, res) {
