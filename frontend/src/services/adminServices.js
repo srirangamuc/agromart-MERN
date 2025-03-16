@@ -14,7 +14,92 @@ export const adminService = {
       console.error('Error fetching dashboard data:', error.message);
       throw error;
     }
+  }, 
+  
+  async fetchTopVendorEachYear() {
+    try {
+      const response = await fetch(`${BASE_URL}/top-vendor-each-year`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      console.log("Over here")
+      if (!response.ok) throw new Error('Failed to top-vendor-each-year');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching top-vendor-each-yea data:', error.message);
+      throw error;
+    }
   },
+  async fetchTopItemEachYear() {
+    try {
+      const response = await fetch(`${BASE_URL}/top-item-each-year`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      console.log("Over here")
+      if (!response.ok) throw new Error('Failed to top-item-each-year');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching top-item-each-yea data:', error.message);
+      throw error;
+    }
+  },
+  async fetchUserCountsByCity() {
+    try {
+      const response = await fetch(`${BASE_URL}/users/city-counts`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch user counts by city');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching user counts by city:', error.message);
+      throw error;
+    }
+  },
+  async fetchRatingsData() {
+    try {
+      const response = await fetch(`${BASE_URL}/ratings`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch ratings');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching ratings:', error.message);
+      throw error;
+    }
+  },
+  
+  async getRatedAndUnratedVendors() {
+    try {
+      const response = await fetch(`${BASE_URL}/rated-unrated`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch rated and unrated vendors');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching rated/unrated vendors:', error.message);
+      throw error;
+    }
+  },
+  async getVendorDetails(vendorId) {
+    try {
+      const response = await fetch(`${BASE_URL}/vendor-details`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vendorId }),
+      });
+      if (!response.ok) throw new Error('Failed to fetch vendor details');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching vendor details:', error.message);
+      throw error;
+    }
+  },
+
 
   async getCustomerAnalysis() {
     try {
