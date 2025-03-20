@@ -20,7 +20,7 @@ const ProfilePage = () => {
         state: '',
         zipCode: '',
         country: '',
-        profilePicture:null,// Add new line.
+        profilePicture:null,
     });
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);

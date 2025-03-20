@@ -108,7 +108,7 @@ const AdminDashboard = () => {
           </div>
           <CustomerAnalysis data={dashboardData.customerAnalysis} />
         </div>
-        
+        {/*City Analysis */}
         <div className="col-span-12">
           <UserStatsGraphs />
         </div>

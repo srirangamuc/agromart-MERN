@@ -179,13 +179,14 @@ app.use(express.static('public'));
 app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Serve uploaded files
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || "mongodb+srv://freshmart:FDWyAmiXk89asnNd@freshmart.mtbq8.mongodb.net/farmer")
-    .then(() => console.log('Database connection successful'.green.bold))
-    .catch(err => {
-        console.error("Database connection error".red.bold, err);
-        // Log database errors to file
-        appendToLog(getLogFilename('db-errors'), err.message);
-    });
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/farmer", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log('Connected to Local MongoDB'.green.bold))
+.catch(err => {
+    console.error("Local Database connection error".red.bold, err);
+});
 
 
 // Authentication routes with CSRF protection
