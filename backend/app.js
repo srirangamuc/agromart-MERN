@@ -179,11 +179,8 @@ app.use(express.static('public'));
 app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Serve uploaded files
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/farmer", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-.then(() => console.log('Connected to Local MongoDB'.green.bold))
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/farmer")
+.then(() => console.log('Connected to MongoDB'.green.bold))
 .catch(err => {
     console.error("Local Database connection error".red.bold, err);
 });

@@ -9,7 +9,8 @@ Welcome to AgroMart! AgroMart is a comprehensive multivendor e-commerce platform
 4. Satya Sai Ramesh Panchakarla (S20220010162):
 5. Sonohar Boggavarapu (S20220010041):
 
-## Features
+## Domain Driven Design Diagram
+![Domain Driven Design](./DDD_group49.drawio.png)
 
 ### For Customers:
 - **User Authentication**: Secure signup and login functionality for customers.
