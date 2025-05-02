@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { registerUser } from "../../services/authServices";
+import { useNavigate } from "react-router-dom";
 
 const SignupForm = () => {
     const [name, setName] = useState("");
@@ -8,10 +9,14 @@ const SignupForm = () => {
     const [password, setPassword] = useState("");
     const [role, setRole] = useState("customer");
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        registerUser(name, email, password, role, dispatch);
+        const result = await registerUser(name, email, password, role, dispatch);
+        if (result.success && result.shouldRedirect) {
+            navigate('/login');
+        }
     };
 
     return (
@@ -45,6 +50,7 @@ const SignupForm = () => {
             >
                 <option value="customer">Customer</option>
                 <option value="vendor">Vendor</option>
+                <option value="distributor">Distributor</option>
             </select>
             <button className="w-full px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600">
                 Signup

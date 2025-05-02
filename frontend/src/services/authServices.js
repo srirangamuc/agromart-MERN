@@ -31,7 +31,7 @@ export const loginUser = async (email, password, dispatch) => {
 };
 
 // Register function
-export const registerUser = async (name, email, password, role, dispatch) => {
+/*export const registerUser = async (name, email, password, role, dispatch) => {
     try {
         const response = await fetch(`${API_URL}/api/signup`, {
             method: 'POST',
@@ -50,8 +50,44 @@ export const registerUser = async (name, email, password, role, dispatch) => {
         // Parse the response and dispatch success
         const data = await response.json();
         dispatch(loginSuccess({ user: data.user, token: data.token }));
+        return data;
     } catch (error) {
         // Dispatch registration failure with the error message
         dispatch(loginFailure({ error: error.message }));
     }
+};*/
+
+export const registerUser = async (name, email, password, role, dispatch) => {
+    try {
+        const response = await fetch(`${API_URL}/api/signup`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name, email, password, role }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            dispatch(loginFailure({ error: data.message || 'Failed to create account' }));
+            return { success: false, message: data.message };
+        }
+
+        // 🔑 Only login automatically if customer or admin
+        if (data.user.role === 'customer' || data.user.role === 'admin') {
+            dispatch(loginSuccess({ user: data.user, token: data.token }));
+        }
+
+        return {
+            success: true,
+            user: data.user,
+            role: data.user.role,
+        };
+
+    } catch (error) {
+        dispatch(loginFailure({ error: error.message }));
+        return { success: false, message: error.message };
+    }
 };
+

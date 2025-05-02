@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginUser, registerUser } from '../services/authServices'; 
 import logo from '../assets/Agormart-removebg-preview.png';
@@ -20,7 +21,7 @@ const AuthPage = ({ onClose }) => {
   const [name, setName] = useState('');
   const [role, setRole] = useState('customer'); // Default role
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const handleLogin = () => {
     if (!email || !password) {
       toast.error("Email and password are required");
@@ -53,7 +54,7 @@ const AuthPage = ({ onClose }) => {
       });
   };
   
-  const handleSignup = () => {
+/*  const handleSignup = () => {
     
     if (!name || !email || !password) {
         toast.error("All fields are required");
@@ -65,8 +66,13 @@ const AuthPage = ({ onClose }) => {
             if (response && response.user) {  // ✅ Check response validity
                 toast.success("Signup successful!");
                 setIsLogin(true);
-            } else {
-                
+
+                if (response.user.role === 'distributor') {
+                    navigate('/login') // Redirect to login page.
+                    toast.info("You are a distributor. Please login to continue.");
+                }
+            } 
+            else {
               toast.error(response?.message || "Signup failed. Please try again.");
             }
         })
@@ -90,7 +96,35 @@ const AuthPage = ({ onClose }) => {
             }
             console.error("Signup error:", error);
         });
+};*/
+
+const handleSignup = async () => {
+  if (!name || !email || !password) {
+      toast.error("All fields are required");
+      return;
+  }
+
+  const response = await registerUser(name, email, password, role, dispatch);
+
+  if (response.success) {
+      toast.success("Signup successful!");
+
+      // Redirect vendor or distributor to login manually
+      if (response.role === 'vendor' || response.role === 'distributor') {
+          toast.info("Please login to continue.");
+          navigate('/login');
+      } else {
+          // Toggle to login form for customer/admin
+          setIsLogin(true);
+      }
+
+  } else {
+      toast.error(response.message || "Signup failed. Please try again.");
+  }
 };
+
+
+
 
 
   return (
