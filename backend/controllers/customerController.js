@@ -2,9 +2,9 @@ const User = require('../models/userModel');
 const Purchase = require('../models/purchaseModel');
 const Item = require('../models/itemModel');
 const bcrypt = require('bcrypt');
+require("dotenv").config()
 const upload = require('../middleware/multerConfig');
-const STRIPE_SECRET_KEY = 'sk_test_51Q1BEGDvKfDjvcpCsEqOVgaKLyoDU660JD41lqYzQU3G9KUsvFmcDiJ72dLMexorHUr4rC91KPBmMeiJxDZlpgru00gDvBILze';
-const stripe = require('stripe')(STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Vendor = require('../models/vendorModel')
 const Distributor = require("../models/distributorModel")
 class CustomerController {
@@ -411,7 +411,7 @@ await purchase.save();
                     }
                 }
     
-                // ✅ Update distributor's total deliveries (MUST BE IN `User`, NOT `Distributor`)
+                // Update distributor's total deliveries 
                 await User.findByIdAndUpdate(assignedDistributor.user._id, {
                     $inc: { totalDeliveries: 1 }
                 });

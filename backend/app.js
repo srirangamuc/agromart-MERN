@@ -179,7 +179,7 @@ app.use(express.static('public'));
 app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Serve uploaded files
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/farmer")
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/farmer",{autoIndex:true})
 .then(() => console.log('Connected to MongoDB'.green.bold))
 .catch(err => {
     console.error("Local Database connection error".red.bold, err);
@@ -218,9 +218,11 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`.cyan.bold);
-    // Log server start to file
-    appendToLog(getLogFilename('server'), `Server started on port ${PORT}`);
-});
+// const PORT = process.env.PORT || 5000;
+// app.listen(PORT, () => {
+//     console.log(`Server is running on port ${PORT}`.cyan.bold);
+//     // Log server start to file
+//     appendToLog(getLogFilename('server'), `Server started on port ${PORT}`);
+// });
+
+module.exports = app

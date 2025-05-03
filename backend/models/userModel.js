@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        index:true
     },
     password: {
         type: String,
@@ -35,13 +36,15 @@ const userSchema = new mongoose.Schema({
     address: {
         hno:{type:String,default : null},
         street: { type: String, default : null },
-        city: { type: String, default : null },
+        city: { type: String, default : null,index:true },
         state: { type: String, default : null },
         country:{type:String, default : null},
         zipCode: { type: String, default : null }
     },
     profilePicture: {type: String, default:null} // new field.
 });
+
+
 
 // Create the model from the schema
 const User = mongoose.model('User', userSchema);
