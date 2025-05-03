@@ -1,0 +1,630 @@
+openapi: 3.0.0
+info:
+  title: Agromart API
+  description: API documentation for Agromart platform with roles: admin, customer, vendor, and distributor
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5000/api
+
+tags:
+  - name: Auth
+  - name: Admin
+  - name: Vendor
+  - name: Distributor
+  - name: Customer
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      required:
+        - name
+        - email
+        - password
+        - role
+      properties:
+        _id:
+          type: string
+          example: 60f7a5f0b4d4f00017c2c9ab
+        name:
+          type: string
+          example: Alice Example
+        email:
+          type: string
+          example: alice@example.com
+        password:
+          type: string
+          example: mysecurepassword
+        role:
+          type: string
+          enum: [customer, vendor, distributor, admin]
+          example: distributor
+        phone:
+          type: string
+          example: "9876543210"
+
+    Vendor:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            address:
+              type: string
+              example: "123 Vendor Lane"
+            shopName:
+              type: string
+              example: "Fresh Mart"
+
+    Distributor:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            location:
+              type: string
+              example: "Bangalore"
+
+    Item:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        price:
+          type: number
+        stock:
+          type: number
+        vendor:
+          type: string
+
+    Purchase:
+      type: object
+      properties:
+        _id:
+          type: string
+        customer:
+          type: string
+        item:
+          type: string
+        quantity:
+          type: number
+
+    VendorRating:
+      type: object
+      properties:
+        _id:
+          type: string
+        vendor:
+          type: string
+        customer:
+          type: string
+        rating:
+          type: number
+
+security:
+  - bearerAuth: []
+
+paths:
+
+  /signup:
+    post:
+      tags: [Auth]
+      summary: Signup a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+            example:
+              name: John Doe
+              email: john@example.com
+              password: secret123
+              role: distributor
+      responses:
+        201:
+          description: Signup successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      name:
+                        type: string
+                      email:
+                        type: string
+                      role:
+                        type: string
+                  token:
+                    type: string
+                  message:
+                    type: string
+              example:
+                user:
+                  _id: 60f7a5f0b4d4f00017c2c9ab
+                  name: John Doe
+                  email: john@example.com
+                  role: distributor
+                token: eyJhbGciOiJIUzI1NiIsInR...
+                message: Signup successful
+        400:
+          description: Invalid input
+        409:
+          description: Email already exists
+
+  /login:
+    post:
+      tags: [Auth]
+      summary: Login a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: john@example.com
+                password:
+                  type: string
+                  example: secret123
+      responses:
+        200:
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      name:
+                        type: string
+                      email:
+                        type: string
+                      role:
+                        type: string
+                  token:
+                    type: string
+                  message:
+                    type: string
+              example:
+                user:
+                  _id: 60f7a5f0b4d4f00017c2c9ab
+                  name: John Doe
+                  email: john@example.com
+                  role: distributor
+                token: eyJhbGciOiJIUzI1NiIsInR...
+                message: Login successful
+        401:
+          description: Unauthorized
+
+
+  /admin/vendors:
+    get:
+      tags: [Admin]
+      summary: Get all vendors
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: List of vendors
+
+  /admin/distributors:
+    get:
+      tags: [Admin]
+      summary: Get all distributors
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: List of distributors
+
+  /vendor/profile:
+    get:
+      tags: [Vendor]
+      summary: Get vendor profile
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Vendor details
+
+  /vendor/items:
+    post:
+      tags: [Vendor]
+      summary: Add item
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        201:
+          description: Item added
+
+    get:
+      tags: [Vendor]
+      summary: Get vendor items
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: List of vendor items
+
+  /vendor/items/{itemId}:
+    put:
+      tags: [Vendor]
+      summary: Update item
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        200:
+          description: Item updated
+
+    delete:
+      tags: [Vendor]
+      summary: Delete item
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Item deleted
+
+  /distributor/profile:
+    get:
+      tags: [Distributor]
+      summary: Get distributor profile
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Distributor info
+
+  /distributor/vendors:
+    get:
+      tags: [Distributor]
+      summary: Get all vendors
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Vendors list
+
+  /distributor/items:
+    get:
+      tags: [Distributor]
+      summary: Get all items
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: All items from all vendors
+
+
+  
+
+  /customer/profile:
+    get:
+      tags: [Customer]
+      summary: Get customer profile
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Customer info
+
+  /customer/products:
+    get:
+      tags: [Customer]
+      summary: View all items
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Item list
+
+  
+
+  /customer/purchases:
+    get:
+      tags: [Customer]
+      summary: View past purchases
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Purchase history
+
+  /customer/rate-vendor:
+    post:
+      tags: [Customer]
+      summary: Submit a rating for a vendor after purchase
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - purchaseId
+                - vendorId
+                - rating
+              properties:
+                purchaseId:
+                  type: string
+                  example: "645bc9d44abc12345678ef90"
+                vendorId:
+                  type: string
+                  example: "67d72255ef757034838ae81b"
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                  example: 4
+      responses:
+        '200':
+          description: Rating submitted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Vendor rating submitted successfully.
+                  averageRating:
+                    type: number
+                    example: 4.25
+        '400':
+          description: Invalid input or unauthorized rating
+        '401':
+          description: Unauthorized
+        '500':
+          description: Server error
+  /customer/rate-distributor:
+    post:
+      tags: [Customer]
+      summary: Rate the assigned distributor for a purchase
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - purchaseId
+                - rating
+              properties:
+                purchaseId:
+                  type: string
+                  example: 681618953fbaa23cc5907d0f
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                  example: 4
+      responses:
+        '200':
+          description: Rating submitted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Rating submitted successfully.
+                  averageRating:
+                    type: string
+                    example: "4.25"
+        '400':
+          description: Bad request (e.g., invalid rating or no distributor assigned)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Rating must be between 1 and 5
+        '404':
+          description: Purchase or Distributor not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Purchase not found
+        '500':
+          description: Internal server error
+  
+  /customer/add-to-cart:
+    post:
+      tags: [Customer]
+      summary: Add an item to the customer's cart
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - vendorId
+                - itemName
+                - quantity
+              properties:
+                vendorId:
+                  type: string
+                  example: "660fef3ab3fa2a001f81e6e9"
+                itemName:
+                  type: string
+                  example: "Tomato"
+                quantity:
+                  type: number
+                  example: 5
+      responses:
+        '200':
+          description: Item added to cart successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                    example: Item added to cart successfully
+        '400':
+          description: Invalid input or unavailable quantity
+        '401':
+          description: Unauthorized
+        '404':
+          description: User, vendor, or item not found
+        '500':
+          description: Internal server error
+
+  /customer/delete-from-cart/{itemId}/{vendorId}:
+    delete:
+      tags: [Customer]
+      summary: Delete an item from the customer's cart
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: itemId
+          required: true
+          schema:
+            type: string
+          example: "660fef3ab3fa2a001f81e6e7"
+        - in: path
+          name: vendorId
+          required: true
+          schema:
+            type: string
+          example: "660fef3ab3fa2a001f81e6e9"
+      responses:
+        '200':
+          description: Item removed from cart successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                    example: Item removed from cart successfully
+        '400':
+          description: Bad request (missing or invalid itemId/vendorId)
+        '401':
+          description: Unauthorized
+        '404':
+          description: User not found
+        '500':
+          description: Internal server error
+
+  /customer/get-cart:
+    get:
+      tags: [Customer]
+      summary: Get all items in the customer's cart
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Cart retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cartItems:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        vendorName:
+                          type: string
+                          example: FreshFarm
+                        itemName:
+                          type: string
+                          example: Tomato
+                        vendorId:
+                          type: string
+                          example: "660fef3ab3fa2a001f81e6e9"
+                        itemId:
+                          type: string
+                          example: "660fef3ab3fa2a001f81e6e7"
+                        cartQuantity:
+                          type: number
+                          example: 5
+                        availableStock:
+                          type: number
+                          example: 100
+                        pricePerKg:
+                          type: number
+                          example: 30
+                        totalPrice:
+                          type: number
+                          example: 150
+                  totalCartValue:
+                    type: string
+                    example: "150.00"
+        '401':
+          description: Unauthorized
+        '404':
+          description: User not found
+        '500':
+          description: Internal server error
+
+
+
+
+
+  

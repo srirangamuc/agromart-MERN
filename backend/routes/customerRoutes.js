@@ -2,10 +2,13 @@ const express = require('express');
 const router = express.Router();
 const customerController = require('../controllers/customerController'); // Assuming CustomerController is the class
 const upload = require('../middleware/multerConfig'); // Import Multer middleware
-
+const vendorController = require('../controllers/vendorController');
+const authenticateUser = require("../middleware/authMiddleware");
+const distributorController = require('../controllers/distributorController');
+router.post('/rate-vendor', authenticateUser, vendorController.rateVendor);
 // Profile Update Route (Supports Image Upload)
 
-
+router.post('/rate-distributor', authenticateUser, distributorController.rateDistributor);
 
 // Customer dashboard
 router.get('/products', (req, res) => customerController.getCustomerDashBoard(req, res));

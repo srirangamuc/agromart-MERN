@@ -14,6 +14,10 @@ const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
 
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./swagger.yaml');
+
 const vendorRoutes = require('./routes/vendorRoutes');
 const customerRoutes = require('./routes/customerRoutes');
 const adminRoutes = require("./routes/adminRoutes");
@@ -23,6 +27,10 @@ const app = express();
 
 // Load environment variables
 dotenv.config();
+
+
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
 // Middleware
