@@ -8,6 +8,8 @@ services:
       - "5173:5173"  # Updated port mapping (frontend on port 5173)
     depends_on:
       - backend
+    environment:
+      - VITE_BACKEND_URL=https://agromart-backend-kbxx.onrender.com
 
   backend:
     build: ./backend
