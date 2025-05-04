@@ -5,20 +5,20 @@ const Vendor = require('../models/vendorModel');
 const authenticateUser = require("../middleware/authMiddleware");
 
 // Route to add a product
-router.post('/add-product', (req, res) => vendorController.addProduct(req, res));
+router.post('/add-product',authenticateUser, (req, res) => vendorController.addProduct(req, res));
 
 // Route to fetch products for the vendor
-router.get('/products', (req, res) => vendorController.getProducts(req, res));
+router.get('/products',authenticateUser, (req, res) => vendorController.getProducts(req, res));
 
 // Route to fetch the vendor dashboard
-router.get('/dashboard', (req, res) => vendorController.getVendorDashboard(req, res));
-router.get('/profile',  (req, res) => vendorController.getProfile(req, res));
+router.get('/dashboard',authenticateUser, (req, res) => vendorController.getVendorDashboard(req, res));
+router.get('/profile',authenticateUser,  (req, res) => vendorController.getProfile(req, res));
 // Route to render the vendor page (including the profile section)
-router.get('/', (req, res) => vendorController.getVendorDashboard(req, res));
-router.post('/', (req, res) => vendorController.updateProfile(req, res)); // Handle profile updates
+router.get('/',authenticateUser, (req, res) => vendorController.getVendorDashboard(req, res));
+router.post('/',authenticateUser, (req, res) => vendorController.updateProfile(req, res)); // Handle profile updates
 
 // Route to fetch profit data
-router.get('/profit-data', async (req, res) => {
+router.get('/profit-data',authenticateUser, async (req, res) => {
     try {
         const vendorId = req.session.userId;
 
@@ -53,7 +53,7 @@ router.get('/profit-data', async (req, res) => {
 
 // Vendor rating route
 router.post('/rate-vendor', authenticateUser, vendorController.rateVendor);
-router.get('/rating', vendorController.getVendorRating);
+router.get('/rating',authenticateUser, vendorController.getVendorRating);
 
 
 module.exports = router;

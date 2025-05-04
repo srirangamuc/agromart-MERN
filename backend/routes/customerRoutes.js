@@ -21,20 +21,17 @@ router.get('/get-cart',authenticateUser,(req, res) => customerController.getCart
 // router.post('/add-to-cart', (req, res) => customerController.addToCart(req, res));
 
 // Add Item to Cart - Debugging Logs Added
-router.post('/add-to-cart', (req, res) => {
-    // console.log("POST /add-to-cart Request Body:", req.body);
-    customerController.addToCart(req, res);
-});
+router.post('/add-to-cart',authenticateUser,(req, res) => {customerController.addToCart(req, res);});
 // Delete an item from the cart
 // router.post('/delete-from-cart', (req, res) => customerController.deleteFromCart(req, res));
 
-router.delete('/delete-from-cart/:itemId/:vendorId', customerController.deleteFromCart);
+router.delete('/delete-from-cart/:itemId/:vendorId',authenticateUser, customerController.deleteFromCart);
 
 
 // Checkout
-router.post('/checkout', (req, res) => customerController.checkout(req, res));
+router.post('/checkout',authenticateUser, (req, res) => customerController.checkout(req, res));
 
-router.get('/profile', (req, res) => customerController.getProfile(req, res));
+router.get('/profile',authenticateUser, (req, res) => customerController.getProfile(req, res));
 
 
 
