@@ -28,26 +28,6 @@ const app = express();
 // Load environment variables
 dotenv.config();
 
-
-
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-
-// Middleware
-const upload = multer({ dest: "uploads/" });
-
-// Middleware
- // Parse JSON requests
-app.use(express.urlencoded({ extended: true }));
-app.use((req, res, next) => {
-    if (req.is('application/json')) {
-      express.json()(req, res, next);
-    } else {
-      next();
-    }
-  }); // This helps with JSON payloads
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const allowedOrigins = [
     "https://agromart-mern-frontend.onrender.com",
     "http://localhost:5173",
@@ -75,6 +55,19 @@ const allowedOrigins = [
       'OPTIONS',
     ],
   }));
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+
+// Middleware
+const upload = multer({ dest: "uploads/" });
+
+// Middleware
+ // Parse JSON requests
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json())
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(cookieParser());
 app.use(
     session({
