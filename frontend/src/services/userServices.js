@@ -1,6 +1,7 @@
 // src/services/userService.js
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
 const BASE_URL = `${API_BASE_URL}/api/customer`; 
+import getAuthHeaders from "./helper";
 
 export const userService = {
   // Fetch user profile data
@@ -8,7 +9,7 @@ export const userService = {
     try {
         const response = await fetch(`${BASE_URL}/profile`, {
             method: 'GET',
-            credentials: 'include',
+            headers: getAuthHeaders(),
         });
 
         if (!response.ok) {
@@ -49,10 +50,7 @@ async updateProfile(profileData) {
     try {
       const response = await fetch(`${BASE_URL}/subscribe`, {
         method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ plan }),
       });
 
@@ -72,7 +70,7 @@ async updateProfile(profileData) {
     try {
       const response = await fetch(`${BASE_URL}/logout`, {
         method: 'POST',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       });
 
       if (!response.ok) {
@@ -90,7 +88,7 @@ async updateProfile(profileData) {
     try {
       const response = await fetch(`${BASE_URL}/purchases`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       });
 
       if (!response.ok) {
