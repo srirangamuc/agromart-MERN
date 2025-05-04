@@ -9,10 +9,7 @@ export const productsService = {
     try {
       const response = await fetch(`${BASE_URL}/products`, {
         method: 'GET',
-        headers:{
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }, 
+        headers:getAuthHeaders(), 
       });
 
       if (!response.ok) {

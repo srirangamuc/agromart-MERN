@@ -48,17 +48,29 @@ const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost/" // for local development
   ];
-app.use(cors({
-    origin: function (origin, callback) {
+  app.use(cors({
+    origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
+        return callback(null, true);
       }
+      callback(new Error('Not allowed by CORS'));
     },
-    credentials: true, // 💡 Required for cookies
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+    ],
+    exposedHeaders: [
+      'Authorization',
+    ],
+    methods: [
+      'GET',
+      'POST',
+      'PUT',
+      'DELETE',
+      'OPTIONS',
+    ],
   }));
-  app.use(cookieParser());
+app.use(cookieParser());
 app.use(
     session({
         secret: process.env.SESSION_SECRET || "secretkey", // Use environment variable for security
