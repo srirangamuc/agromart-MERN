@@ -30,7 +30,7 @@ jobs:
 
       # Set up Docker Compose (ensure your docker-compose.yml is in the repo)
       - name: Set up Docker Compose
-        uses: docker/setup-compose-action@v2
+        uses: docker/setup-compose-action@v1
         with:
           # This will use your docker-compose.yml to build both frontend and backend
           file: docker-compose.yml
