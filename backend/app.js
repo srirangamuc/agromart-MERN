@@ -42,7 +42,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); // This helps with JSON payloads
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 const allowedOrigins = [
     "https://agromart-mern-frontend.onrender.com",
     "http://localhost:5173",
@@ -144,7 +143,6 @@ const accessLogStream = {
 
 // Basic middleware
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json());
 
 
 app.use('/api/vendor', vendorRoutes);

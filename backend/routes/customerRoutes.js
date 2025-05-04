@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const customerController = require('../controllers/customerController'); // Assuming CustomerController is the class
-const upload = require('../middleware/multerConfig'); // Import Multer middleware
+const upload = require('../multer-cloudinary'); // Import Multer middleware
 const vendorController = require('../controllers/vendorController');
 const authenticateUser = require("../middleware/authMiddleware");
 const distributorController = require('../controllers/distributorController');

@@ -1476,15 +1476,14 @@ await purchase.save();
             // console.log("📁 Uploaded file:", req.file);
     
             // Handle profile picture upload
-            if (req.file) {
-                const allowedTypes = ["image/png", "image/jpg", "image/jpeg"];
+            if (req.file && req.file.path) {
+                const allowedTypes = ["image/png", "image/jpg", "image/jpeg", "image/webp"];
                 if (!allowedTypes.includes(req.file.mimetype)) {
-                    return res.status(400).json({ error: "Invalid file type. Only PNG, JPG, and JPEG are allowed." });
+                    return res.status(400).json({ error: "Invalid file type. Only PNG, JPG, JPEG, and WEBP are allowed." });
                 }
     
-                // Update profile picture path
-                customer.profilePicture = `/uploads/${req.file.filename}`;
-                // console.log(`📸 Uploaded File Path: ${customer.profilePicture}`);
+                // Cloudinary URL is stored directly
+                customer.profilePicture = req.file.path;
             }
     
             // Save updated customer data
