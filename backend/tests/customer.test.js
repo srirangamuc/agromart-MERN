@@ -23,7 +23,7 @@ jest.mock('stripe', () => {
     },
   }));
 });
-jest.mock('bcrypt');
+jest.mock('bcryptjs');
 
 // Stripe instance mock
 const stripeMock = require('stripe')();
@@ -70,7 +70,7 @@ beforeAll(async () => {
     save: jest.fn().mockResolvedValue(true),
   };
   User.findOne.mockResolvedValue(mockUser);
-  require('bcrypt').compare.mockResolvedValue(true);
+  require('bcryptjs').compare.mockResolvedValue(true);
 
   const loginRes = await request(app)
     .post('/api/login')

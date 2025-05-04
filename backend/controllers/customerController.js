@@ -723,7 +723,7 @@ module.exports = new CustomerController();*/
 const User = require('../models/userModel');
 const Purchase = require('../models/purchaseModel');
 const Item = require('../models/itemModel');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 require("dotenv").config()
 const upload = require('../middleware/multerConfig');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);

@@ -5,6 +5,7 @@ require('dotenv').config();
 const redisClient = redis.createClient({
     url: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
     socket: {
+        tls:true,
         reconnectStrategy: (retries) => {
             if (retries > 5) {
                 console.error('Redis: Max retries reached, giving up.');

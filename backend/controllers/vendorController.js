@@ -317,7 +317,7 @@ const Item = require('../models/itemModel');
 const VendorRating = require('../models/vendorRatingModel');
 const Vendor = require('../models/vendorModel');
 const User = require('../models/userModel');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const Purchase = require("../models/purchaseModel");
 // Predefined list of allowed fruits and vegetables
 const allowedProducts = [

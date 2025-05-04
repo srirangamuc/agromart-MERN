@@ -4,7 +4,7 @@ const VendorRating = require('../models/vendorRatingModel');
 const Vendor = require('../models/vendorModel');
 const User = require('../models/userModel');
 const Purchase = require('../models/purchaseModel');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 // Mock the models
 jest.mock('../models/itemModel');
@@ -12,7 +12,7 @@ jest.mock('../models/vendorRatingModel');
 jest.mock('../models/vendorModel');
 jest.mock('../models/userModel');
 jest.mock('../models/purchaseModel');
-jest.mock('bcrypt');
+jest.mock('bcrypjst');
 
 describe('VendorController', () => {
     let req, res;
@@ -146,7 +146,7 @@ describe('VendorController', () => {
             const mockUser = { _id: '123', name: 'OldName', address: {}, save: jest.fn().mockResolvedValue(true) };
 
             User.findById.mockResolvedValue(mockUser);
-            bcrypt.hash.mockResolvedValue('hashedPassword');
+            bcryptjs.hash.mockResolvedValue('hashedPassword');
 
             await VendorController.updateProfile(req, res);
 

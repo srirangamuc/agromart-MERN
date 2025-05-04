@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./frontend
+    image: srirangamuc/agromart-mern-frontend:latest
+    ports:
+      - "5173:5173"  # Updated port mapping (frontend on port 5173)
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    image: srirangamuc/agromart-mern-backend:latest
+    ports:
+      - "5000:5000"  # Backend still uses port 5000
+    environment:
+      - REDIS_URL=redis://default:ATuJAAIjcDFlMTc0ODI3ZTI5NWM0MTkxYmJlYzFhYWFiNDYxZDU3ZHAxMA@romantic-trout-15241.upstash.io:6379
+      - MONGODB_URI=mongodb+srv://freshmart:FDWyAmiXk89asnNd@freshmart.mtbq8.mongodb.net/farmer
+      - STRIPE_SECRET_KEY=sk_test_51Q1BEGDvKfDjvcpCsEqOVgaKLyoDU660JD41lqYzQU3G9KUsvFmcDiJ72dLMexorHUr4rC91KPBmMeiJxDZlpgru00gDvBILze
+      - NODE_ENV=production
+
+ 
