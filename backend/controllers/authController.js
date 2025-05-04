@@ -31,7 +31,7 @@ class AuthController {
                 if (err) {
                     return res.status(500).json({ message: "Session error" });
                 }
-                req.user?.id = user._id.toString();
+                req.session.userId = user._id.toString();
                 req.session.userRole = user.role;
                 req.session.userName = user.name;
                 req.session.save((err) => {
