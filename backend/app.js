@@ -48,7 +48,7 @@ const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost/" // for local development
   ];
-  app.use(cors({
+app.use(cors({
     origin: function (origin, callback) {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
@@ -133,27 +133,6 @@ const accessLogStream = {
 // Basic middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
-
-// CORS configuration
-app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true,
-    // exposedHeaders: ['csrf-token']
-}));
-
-// Cookie and session configuration
-app.use(cookieParser());
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'secretkey',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        maxAge: 1000 * 60 * 60 * 24, // 24 hours
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        // sameSite: 'lax'
-    }
-}));
 
 
 app.use('/api/vendor', vendorRoutes);

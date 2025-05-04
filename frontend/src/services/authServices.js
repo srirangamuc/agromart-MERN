@@ -2,6 +2,7 @@ import { loginSuccess, loginFailure } from '../redux/authSlice';
 
 // Base API URL
 const API_URL = import.meta.env.VITE_BACKEND_URL;
+console.log(API_URL)
 
 // Login function
 export const loginUser = async (email, password, dispatch) => {
