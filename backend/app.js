@@ -46,7 +46,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const allowedOrigins = [
     "https://agromart-frontend-06gx.onrender.com",
     "http://localhost:5173",
-    "http://localhost" // for local development
+    "http://localhost/" // for local development
   ];
   app.use(cors({
     origin: function (origin, callback) {
