@@ -12,7 +12,7 @@ export const loginUser = async (email, password, dispatch) => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ email, password }),
-            credentials: 'include', // Ensure this is set to send cookies
+             // Ensure this is set to send cookies
         });
 
         if (!response.ok) {
