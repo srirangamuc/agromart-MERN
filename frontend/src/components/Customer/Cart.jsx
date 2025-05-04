@@ -95,7 +95,7 @@ function Cart() {
                                     <div className="flex items-center space-x-6">
                                         <div className="bg-gray-100 p-3 rounded-xl">
                                             <img 
-                                                src={`src/assets/images/resized_images/${cartItem.itemName}.png`}
+                                                src={`public/images/resized_images/${cartItem.itemName}.png`}
                                                 alt={cartItem.name}
                                                 className="w-16 h-16 object-cover rounded-lg"
                                             />
