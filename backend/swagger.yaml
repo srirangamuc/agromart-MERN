@@ -220,25 +220,112 @@ paths:
           description: Unauthorized
 
 
-  /admin/vendors:
+  /admin:
     get:
       tags: [Admin]
-      summary: Get all vendors
+      summary: Get admin dashboard data
       security:
         - bearerAuth: []
       responses:
         200:
-          description: List of vendors
+          description: Dashboard data including counts
 
-  /admin/distributors:
+
+  /admin/customer-analysis:
     get:
       tags: [Admin]
-      summary: Get all distributors
+      summary: Analyze customer subscriptions
       security:
         - bearerAuth: []
       responses:
         200:
-          description: List of distributors
+          description: Subscription type analysis of customers
+
+  /admin/purchases-analysis:
+    get:
+      tags: [Admin]
+      summary: Analyze purchases by item
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Analysis of item purchase quantities
+
+  /admin/rated-unrated:
+    get:
+      tags: [Admin]
+      summary: Get rated and unrated vendors
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Lists of rated and unrated vendors
+
+  /admin/users/city-counts:
+    get:
+      tags: [Admin]
+      summary: Get user distribution by city and role
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Number of users grouped by city and role
+
+  /admin/ratings:
+    get:
+      tags: [Admin]
+      summary: Get vendor and delivery ratings
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Rating distribution and average ratings
+
+
+  /vendor/add-product:
+    post:
+      tags: [Vendor]
+      summary: Add a new product
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - quantity
+                - pricePerKg
+              properties:
+                name:
+                  type: string
+                quantity:
+                  type: integer
+                pricePerKg:
+                  type: number
+      responses:
+        200:
+          description: Product added successfully
+        400:
+          description: Invalid input
+        500:
+          description: Server error
+
+  /vendor/products:
+    get:
+      tags: [Vendor]
+      summary: Get all products for a vendor
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: List of vendor products
+        400:
+          description: Vendor not logged in
+        500:
+          description: Server error
 
   /vendor/profile:
     get:
@@ -248,12 +335,33 @@ paths:
         - bearerAuth: []
       responses:
         200:
-          description: Vendor details
+          description: Vendor profile
+        401:
+          description: User not authenticated
+        404:
+          description: User not found
+        500:
+          description: Server error
 
-  /vendor/items:
+    
+
+  /vendor:
+    get:
+      tags: [Vendor]
+      summary: Get vendor dashboard (same as /dashboard)
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Dashboard data including profile and profits
+        400:
+          description: Vendor not logged in
+        500:
+          description: Server error
+
     post:
       tags: [Vendor]
-      summary: Add item
+      summary: Update vendor profile (same as /profile)
       security:
         - bearerAuth: []
       requestBody:
@@ -261,57 +369,61 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Item'
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                email:
+                  type: string
+                hno:
+                  type: string
+                street:
+                  type: string
+                city:
+                  type: string
+                state:
+                  type: string
+                country:
+                  type: string
+                zipCode:
+                  type: string
       responses:
-        201:
-          description: Item added
+        200:
+          description: Profile updated successfully
+        401:
+          description: User not authenticated
+        404:
+          description: User not found
+        500:
+          description: Server error
 
+  /vendor/profit-data:
     get:
       tags: [Vendor]
-      summary: Get vendor items
+      summary: Get vendor profit data for chart
       security:
         - bearerAuth: []
       responses:
         200:
-          description: List of vendor items
+          description: Product names and profit values
+        500:
+          description: Server error
 
-  /vendor/items/{itemId}:
-    put:
+  /vendor/rating:
+    get:
       tags: [Vendor]
-      summary: Update item
+      summary: Get average vendor rating and count
       security:
         - bearerAuth: []
-      parameters:
-        - name: itemId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Item'
       responses:
         200:
-          description: Item updated
+          description: Vendor rating data
+        500:
+          description: Internal server error
 
-    delete:
-      tags: [Vendor]
-      summary: Delete item
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: itemId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: Item deleted
-
-  /distributor/profile:
+  /distributor:
     get:
       tags: [Distributor]
       summary: Get distributor profile
@@ -319,27 +431,118 @@ paths:
         - bearerAuth: []
       responses:
         200:
-          description: Distributor info
+          description: Distributor profile fetched successfully
+        401:
+          description: Not authenticated
+        404:
+          description: Distributor not found
 
-  /distributor/vendors:
+  /distributor/update-availability:
+    post:
+      tags: [Distributor]
+      summary: Update distributor availability status
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                available:
+                  type: boolean
+      responses:
+        200:
+          description: Availability updated successfully
+        401:
+          description: Not authenticated
+        404:
+          description: Distributor not found or unauthorized
+        500:
+          description: Server error
+
+  /distributor/update-info:
+    post:
+      tags: [Distributor]
+      summary: Update distributor information (contact phone, address, profile picture)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                contactPhone:
+                  type: string
+                  example: '["1234567890", "0987654321"]'
+                address:
+                  type: string
+                  example: '{"hno":"123", "city":"Delhi", "state":"Delhi", "zipCode":"110001"}'
+                profilePicture:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Distributor info updated successfully
+        401:
+          description: Not authenticated
+        404:
+          description: Distributor not found
+        500:
+          description: Server error
+
+  /distributor/assigned-purchases:
     get:
       tags: [Distributor]
-      summary: Get all vendors
+      summary: Get all purchases assigned to the distributor
       security:
         - bearerAuth: []
       responses:
         200:
-          description: Vendors list
+          description: List of assigned purchases
+        401:
+          description: Not authenticated
+        404:
+          description: Distributor not found
+        500:
+          description: Server error
 
-  /distributor/items:
-    get:
+  /distributor/update-delivery-status:
+    post:
       tags: [Distributor]
-      summary: Get all items
+      summary: Update delivery status for a purchase
       security:
         - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - purchaseId
+                - status
+              properties:
+                purchaseId:
+                  type: string
+                  example: "662f2351bd833bcbc0c514a9"
+                status:
+                  type: string
+                  enum: [assigned, out for delivery, delivered]
       responses:
         200:
-          description: All items from all vendors
+          description: Delivery status updated successfully
+        400:
+          description: Invalid status update
+        401:
+          description: Not authenticated
+        404:
+          description: Purchase not found or unauthorized
+        500:
+          description: Server error
 
 
   
