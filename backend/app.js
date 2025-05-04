@@ -44,7 +44,7 @@ app.use(express.json()); // This helps with JSON payloads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const allowedOrigins = [
-    "https://agromart-frontend-06gx.onrender.com",
+    "https://agromart-mern-frontend.onrender.com",
     "http://localhost:5173",
     "http://localhost/" // for local development
   ];
