@@ -8,8 +8,7 @@ export const loginUser = async (email, password, dispatch) => {
     try {
         const response = await fetch(`${API_URL}/api/login`, {
             method: 'POST',
-            headers: getAuthHeaders(),
-            credentials: 'include', // Send cookies
+            headers: getAuthHeaders(), // Send cookies
             body: JSON.stringify({ email, password }),
         });
 
@@ -35,8 +34,7 @@ export const registerUser = async (name, email, password, role, dispatch) => {
     try {
         const response = await fetch(`${API_URL}/api/signup`, {
             method: 'POST',
-            headers: getAuthHeaders(),
-            credentials: 'include', // Send cookies
+            headers: getAuthHeaders(), // Send cookies
             body: JSON.stringify({ name, email, password, role }),
         });
 

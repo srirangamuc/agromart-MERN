@@ -12,7 +12,6 @@ export const cartServices = {
     try {
         const response = await fetch(`${BASE_URL}/add-to-cart`, {
             method: 'POST',
-            credentials: 'include',
             headers: getAuthHeaders(),
             body: JSON.stringify({ itemName, vendorId, quantity }),
         });
@@ -52,7 +51,6 @@ export const cartServices = {
     try {
         const response = await fetch(`${BASE_URL}/get-cart`, {
             method: 'GET',
-            credentials: 'include',
         });
 
         const data = await response.json();
@@ -74,7 +72,6 @@ export const cartServices = {
     try {
         const response = await fetch(`${BASE_URL}/delete-from-cart/${itemId}/${vendorId}`, {
             method: 'DELETE',
-            credentials: 'include',
             headers: getAuthHeaders(),
         });
   
@@ -95,7 +92,6 @@ export const cartServices = {
       console.log("Calling checkout API with:", paymentMethod);
       const response = await fetch(`${BASE_URL}/checkout`, {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },

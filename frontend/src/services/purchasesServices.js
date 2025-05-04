@@ -14,7 +14,6 @@ export const purchasesService = {
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ purchaseId, rating }),
-                credentials: 'include'
             });
 
             if (!response.ok) {
@@ -40,7 +39,6 @@ export const purchasesService = {
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ purchaseId, vendorId, rating }),
-                credentials: 'include'
             });
 
             if (!response.ok) {

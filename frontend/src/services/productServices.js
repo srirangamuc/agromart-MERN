@@ -30,11 +30,8 @@ export const productsService = {
   async getVendorsByItem(itemName) {
     try {
         const response = await fetch(`${BASE_URL}/vendors/${encodeURIComponent(itemName)}`, {
-            method: 'GET',
-            credentials: 'include', // If using cookies/session authentication
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            method: 'GET', // If using cookies/session authentication
+            headers: getAuthHeaders(),
         });
 
         if (!response.ok) throw new Error(`Failed to fetch vendors for ${itemName}`);
@@ -56,7 +53,6 @@ async addToCart(itemId, vendorId, quantity) {
   try {
       const response = await fetch(`${BASE_URL}/add-to-cart`, {
           method: 'POST',
-          credentials: 'include',
           headers: getAuthHeaders(),
           body: JSON.stringify({ itemId, vendorId, quantity }),
       });
@@ -75,7 +71,6 @@ async addToCart(itemId, vendorId, quantity) {
     try {
         const response = await fetch(`${BASE_URL}/delete-from-cart`, {
             method: 'POST',
-            credentials: 'include',
             headers: getAuthHeaders(),
             body: JSON.stringify({ itemId, vendorId }), // Include vendorId for specific removal
         });
@@ -97,7 +92,6 @@ async addToCart(itemId, vendorId, quantity) {
     try {
       const response = await fetch(`${BASE_URL}/checkout`, {
         method: 'POST',
-        credentials: 'include',
         headers: getAuthHeaders(),
         body: JSON.stringify({ cartItems }),
       });
