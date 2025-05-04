@@ -53,7 +53,7 @@ app.use(
         cookie: {
             maxAge: 86400000, // Cookie expiration (1 day in milliseconds)
             httpOnly: true,    // Prevent JavaScript access to cookies
-            secure: process.env.NODE_ENV === 'production', // Set to true in production, false in development
+            secure: true, // Set to true in production, false in development
             sameSite: 'None',  // Allow cross-origin cookies, useful if frontend and backend are on different domains/subdomains
         },
     })
