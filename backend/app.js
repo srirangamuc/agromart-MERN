@@ -47,13 +47,17 @@ app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(cookieParser());
 app.use(
     session({
-        secret: process.env.SESSION_SECRET || "secretkey",
+        secret: process.env.SESSION_SECRET || "secretkey", // Use environment variable for security
         resave: false,
         saveUninitialized: false,
-        cookie: { maxAge: 86400000, httpOnly: true, secure: false },
+        cookie: {
+            maxAge: 86400000, // Cookie expiration (1 day in milliseconds)
+            httpOnly: true,    // Prevent JavaScript access to cookies
+            secure: process.env.NODE_ENV === 'production', // Set to true in production, false in development
+            sameSite: 'None',  // Allow cross-origin cookies, useful if frontend and backend are on different domains/subdomains
+        },
     })
 );
-
 
 // Create logs directory if it doesn't exist
 const logDirectory = path.join(__dirname, 'logs');
