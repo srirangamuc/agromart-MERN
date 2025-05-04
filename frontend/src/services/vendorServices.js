@@ -1,5 +1,6 @@
 // services/vendorService.js
-const BASE_URL = "http://localhost:5000/api/vendor"; // Base URL for vendor endpoints
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
+const BASE_URL = `${API_BASE_URL}/api/vendor`; // Base URL for vendor endpoints
 
 class vendorService {
     // Add a new product

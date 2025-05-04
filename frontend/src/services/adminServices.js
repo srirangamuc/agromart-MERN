@@ -1,4 +1,5 @@
-const BASE_URL = 'http://localhost:5000/api/admin'; // Base route for admin endpoints
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
+const BASE_URL = `${API_BASE_URL}/api/admin`; // Base route for admin endpoints
 
 export const adminService = {
   async getDashboardData() {

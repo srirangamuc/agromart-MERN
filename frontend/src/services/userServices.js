@@ -1,5 +1,6 @@
 // src/services/userService.js
-const BASE_URL = 'http://localhost:5000/api/customer'; // Update with your API URL
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
+const BASE_URL = `${API_BASE_URL}/api/customer`; 
 
 export const userService = {
   // Fetch user profile data

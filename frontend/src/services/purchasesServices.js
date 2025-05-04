@@ -1,5 +1,6 @@
-const API_DISTRIBUTOR_URL = 'http://localhost:5000/api/distributor'; 
-const API_VENDOR_URL = 'http://localhost:5000/api/vendor';  // ✅ Define vendor API URL
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
+const API_DISTRIBUTOR_URL = `${API_BASE_URL}/api/distributor`; 
+const API_VENDOR_URL = `${API_BASE_URL}/api/vendor`;  
 
 export const purchasesService = {
     rateDistributor: async (purchaseId, rating) => {

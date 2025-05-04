@@ -1,4 +1,5 @@
-const BASE_URL = 'http://localhost:5000/api/customer'; // Update with your API URL
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
+const BASE_URL = `${API_BASE_URL}/api/customer`; // Update with your API URL
 
 export const productsService = {
   // Fetching the list of products
