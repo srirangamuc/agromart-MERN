@@ -93,9 +93,7 @@ export const cartServices = {
       console.log("Calling checkout API with:", paymentMethod);
       const response = await fetch(`${BASE_URL}/checkout`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ paymentMethod }),
       });
   
