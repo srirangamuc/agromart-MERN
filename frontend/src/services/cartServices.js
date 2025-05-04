@@ -51,6 +51,7 @@ export const cartServices = {
     try {
         const response = await fetch(`${BASE_URL}/get-cart`, {
             method: 'GET',
+            headers:getAuthHeaders()
         });
 
         const data = await response.json();
