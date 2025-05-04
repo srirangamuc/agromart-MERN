@@ -21,5 +21,6 @@ services:
       - MONGODB_URI=mongodb+srv://freshmart:FDWyAmiXk89asnNd@freshmart.mtbq8.mongodb.net/farmer
       - STRIPE_SECRET_KEY=sk_test_51Q1BEGDvKfDjvcpCsEqOVgaKLyoDU660JD41lqYzQU3G9KUsvFmcDiJ72dLMexorHUr4rC91KPBmMeiJxDZlpgru00gDvBILze
       - NODE_ENV=production
+      - JWT_SECRET=7mjLhwDOGeaS5eYlY3y3ULdsOpuWOXri46SV97pvl68x6zRVXYCf5abjscXaWjRDj0WeGL6QWp
 
  
