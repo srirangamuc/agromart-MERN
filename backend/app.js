@@ -58,11 +58,6 @@ const allowedOrigins = [
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-
-// Middleware
-const upload = multer({ dest: "uploads/" });
-
-// Middleware
  // Parse JSON requests
 app.use(express.urlencoded({ extended: true }));
 
