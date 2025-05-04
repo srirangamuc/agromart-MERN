@@ -65,7 +65,6 @@ const upload = multer({ dest: "uploads/" });
 // Middleware
  // Parse JSON requests
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json())
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(cookieParser());
@@ -155,6 +154,8 @@ app.use("/api/distributor", distributorRoutes);
   
 //     }
 // });
+
+app.use(express.json())
 
 // Logging middleware
 app.use(morgan(':custom')); // Console logging
