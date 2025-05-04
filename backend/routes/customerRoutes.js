@@ -5,15 +5,17 @@ const upload = require('../middleware/multerConfig'); // Import Multer middlewar
 const vendorController = require('../controllers/vendorController');
 const authenticateUser = require("../middleware/authMiddleware");
 const distributorController = require('../controllers/distributorController');
+
+
 router.post('/rate-vendor', authenticateUser, vendorController.rateVendor);
 // Profile Update Route (Supports Image Upload)
 
 router.post('/rate-distributor', authenticateUser, distributorController.rateDistributor);
 
 // Customer dashboard
-router.get('/products', (req, res) => customerController.getCustomerDashBoard(req, res));
-router.get('/vendors/:itemName',(req, res) => customerController.getVendorsByItem(req, res));
-router.get('/get-cart', (req, res) => customerController.getCart(req, res));
+router.get('/products',authenticateUser,(req, res) => customerController.getCustomerDashBoard(req, res));
+router.get('/vendors/:itemName',authenticateUser,(req, res) => customerController.getVendorsByItem(req, res));
+router.get('/get-cart',authenticateUser,(req, res) => customerController.getCart(req, res));
 
 // Add item to cart
 // router.post('/add-to-cart', (req, res) => customerController.addToCart(req, res));

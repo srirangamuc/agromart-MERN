@@ -842,7 +842,7 @@ class CustomerController {
     // Get Customer Dashboard with Redis caching
     async getCustomerDashBoard(req, res) {
         try {
-            const userId = req.session.userId;
+            const userId = req.user?.id;
 
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
