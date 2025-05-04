@@ -46,20 +46,20 @@ router.post('/update-profile', upload.single('profilePicture'), (req, res) => {
 
 
 // Purchases
-router.get('/purchases', (req, res) => customerController.getPurchases(req, res));
+router.get('/purchases',authenticateUser, (req, res) => customerController.getPurchases(req, res));
 
 // Subscription
-router.post('/subscribe', (req, res) => customerController.purchaseSubscription(req, res));
+router.post('/subscribe',authenticateUser,(req, res) => customerController.purchaseSubscription(req, res));
 
 // Success Subscription
-router.get('/success-subscription', (req, res) => customerController.successSubscription(req, res));
+router.get('/success-subscription',authenticateUser, (req, res) => customerController.successSubscription(req, res));
 
 // Payment Cancellation
-router.get('/cancel', (req, res) => customerController.cancelPayment(req, res));
+router.get('/cancel',authenticateUser, (req, res) => customerController.cancelPayment(req, res));
 
 // Success and Failure Pages (now returning JSON instead of rendering EJS)
-router.get('/success', (req, res) => customerController.getSuccess(req, res)); // Changed to return JSON
-router.get('/failure', (req, res) => customerController.getFailure(req, res)); // Changed to return JSON
+router.get('/success',authenticateUser, (req, res) => customerController.getSuccess(req, res)); // Changed to return JSON
+router.get('/failure',authenticateUser, (req, res) => customerController.getFailure(req, res)); // Changed to return JSON
 
 // Logout
 router.post('/logout', (req, res) => customerController.logout(req, res)); // Changed to return JSON
