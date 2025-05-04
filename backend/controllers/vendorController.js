@@ -17,7 +17,7 @@ class VendorController {
     async addProduct(req, res) {
         try {
             let { name, quantity, pricePerKg } = req.body;
-            const vendorId = req.session.userId;
+            const vendorId = req.user?.id;
             // console.log(vendorId)
 
             // Convert quantity and pricePerKg to numbers
@@ -68,7 +68,7 @@ class VendorController {
     // Function to fetch products for the vendor
     async getProducts(req, res) {
         try {
-            const vendorId = req.session.userId;
+            const vendorId = req.user?.id;
             if (!vendorId) {
                 return res.status(400).json({ error: 'Vendor must be logged in' });
             }
@@ -86,7 +86,7 @@ class VendorController {
     // Function to fetch the vendor dashboard data
     async getVendorDashboard(req, res) {
         try {
-            const vendorId = req.session.userId;
+            const vendorId = req.user?.id;
 
             if (!vendorId) {
                 return res.status(400).json({ error: 'Vendor must be logged in' });
@@ -113,7 +113,7 @@ class VendorController {
     // Update profile
     async updateProfile(req, res) {
         try {
-            const userId = req.session.userId;
+            const userId = req.user?.id;
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
             }
@@ -177,7 +177,7 @@ class VendorController {
     }
     async getProfile(req, res) {
         try {
-          const userId = req.session.userId; // Get the userId from the session
+          const userId = req.user?.id; // Get the userId from the session
       
           if (!userId) {
             return res.status(401).json({ error: 'User not authenticated' }); // Handle unauthenticated users
@@ -292,7 +292,7 @@ async rateVendor(req, res) {
 
     /*async  getVendorRating(req, res) {
         try {
-            const vendorId  =  req.session.userId;
+            const vendorId  =  req.user?.id;
             // console.log("Vendor ID:", vendorId);
             const vendorRating = await VendorRating.findOne({ vendor: vendorId });
     
@@ -332,7 +332,7 @@ class VendorController {
     async addProduct(req, res) {
         try {
             let { name, quantity, pricePerKg } = req.body;
-            const vendorId = req.session.userId;
+            const vendorId = req.user?.id;
             // console.log(vendorId)
 
             // Convert quantity and pricePerKg to numbers
@@ -383,7 +383,7 @@ class VendorController {
     // Function to fetch products for the vendor
     async getProducts(req, res) {
         try {
-            const vendorId = req.session.userId;
+            const vendorId = req.user?.id;
             if (!vendorId) {
                 return res.status(400).json({ error: 'Vendor must be logged in' });
             }
@@ -413,7 +413,7 @@ class VendorController {
     // Function to fetch the vendor dashboard data
     async getVendorDashboard(req, res) {
         try {
-            const vendorId = req.session.userId;
+            const vendorId = req.user?.id;
 
             if (!vendorId) {
                 return res.status(400).json({ error: 'Vendor must be logged in' });
@@ -451,7 +451,7 @@ class VendorController {
     // Update profile
     async updateProfile(req, res) {
         try {
-            const userId = req.session.userId;
+            const userId = req.user?.id;
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
             }
@@ -515,7 +515,7 @@ class VendorController {
     }
     async getProfile(req, res) {
         try {
-          const userId = req.session.userId; // Get the userId from the session
+          const userId = req.user?.id; // Get the userId from the session
       
           if (!userId) {
             return res.status(401).json({ error: 'User not authenticated' }); // Handle unauthenticated users
@@ -637,7 +637,7 @@ async rateVendor(req, res) {
 
     async  getVendorRating(req, res) {
         try {
-            const vendorId  =  req.session.userId;
+            const vendorId  =  req.user?.id;
             // console.log("Vendor ID:", vendorId);
             const vendorRating = await VendorRating.findOne({ vendor: vendorId });
     

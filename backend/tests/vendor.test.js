@@ -77,7 +77,7 @@ describe('VendorController', () => {
         });
 
         it('should return 400 if not authenticated', async () => {
-            req.session.userId = null;
+            req.user?.id = null;
             req.body = { name: 'Apple', quantity: '100', pricePerKg: '2.5' };
 
             await VendorController.addProduct(req, res);
@@ -102,7 +102,7 @@ describe('VendorController', () => {
         });
 
         it('should return 400 if not authenticated', async () => {
-            req.session.userId = null;
+            req.user?.id = null;
 
             await VendorController.getProducts(req, res);
 
@@ -131,7 +131,7 @@ describe('VendorController', () => {
         });
 
         it('should return 400 if not authenticated', async () => {
-            req.session.userId = null;
+            req.user?.id = null;
 
             await VendorController.getVendorDashboard(req, res);
 
@@ -160,7 +160,7 @@ describe('VendorController', () => {
         });
 
         it('should return 401 if not authenticated', async () => {
-            req.session.userId = null;
+            req.user?.id = null;
 
             await VendorController.updateProfile(req, res);
 
@@ -196,7 +196,7 @@ describe('VendorController', () => {
         });
 
         it('should return 401 if not authenticated', async () => {
-            req.session.userId = null;
+            req.user?.id = null;
 
             await VendorController.getProfile(req, res);
 

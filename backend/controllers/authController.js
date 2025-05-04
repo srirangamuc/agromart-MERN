@@ -31,7 +31,7 @@ class AuthController {
                 if (err) {
                     return res.status(500).json({ message: "Session error" });
                 }
-                req.session.userId = user._id.toString();
+                req.user?.id = user._id.toString();
                 req.session.userRole = user.role;
                 req.session.userName = user.name;
                 req.session.save((err) => {
@@ -87,7 +87,7 @@ class AuthController {
                 if (err) {
                     return res.status(500).json({ message: "Session error" });
                 }
-                req.session.userId = newUser._id.toString();
+                req.user?.id = newUser._id.toString();
                 req.session.userRole = newUser.role;
                 req.session.userName = newUser.name;
                 req.session.save((err) => {

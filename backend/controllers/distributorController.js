@@ -6,7 +6,7 @@ const Purchase = require("../models/purchaseModel")
 exports.getDistributorDetails = async (req, res) => {
     // console.log("🔥 getDistributorDetails REACHED!");
 
-    const distributorId = req.session.userId;
+    const distributorId = req.user?.id;
 
     if (!distributorId) {
         // console.log("🚨 ERROR: No session userId found");
@@ -51,7 +51,7 @@ exports.getDistributorDetails = async (req, res) => {
 
 
 exports.updateAvailability = async (req, res) => {
-    const distributorId = req.session.userId;
+    const distributorId = req.user?.id;
 
     if (!distributorId) {
         return res.status(401).json({ message: "Not authenticated." });
@@ -87,7 +87,7 @@ exports.updateAvailability = async (req, res) => {
 };
 
 exports.updateDistributorInfo = async (req, res) => {
-    const distributorId = req.session.userId;
+    const distributorId = req.user?.id;
 
     if (!distributorId) {
         return res.status(401).json({ message: "Not authenticated." });
@@ -142,7 +142,7 @@ exports.updateDistributorInfo = async (req, res) => {
 
 
 exports.getAssignedPurchases = async (req, res) => {
-    const distributorId = req.session.userId;
+    const distributorId = req.user?.id;
 
     if (!distributorId) {
         return res.status(401).json({ message: "Not authenticated." });
@@ -176,7 +176,7 @@ exports.getAssignedPurchases = async (req, res) => {
 
 
 exports.updateDeliveryStatus = async (req, res) => {
-    const distributorId = req.session.userId;
+    const distributorId = req.user?.id;
     const { purchaseId, status } = req.body;
 
     if (!distributorId) {
@@ -275,7 +275,7 @@ exports.rateDistributor = async (req, res) => {
 };
 
 /*exports.getDistributorDetails = async (req, res) => {
-    const distributorId = req.session.userId;
+    const distributorId = req.user?.id;
 
     if (!distributorId) {
         return res.status(401).json({ message: "Not authenticated." });
@@ -312,7 +312,7 @@ exports.rateDistributor = async (req, res) => {
 
 
 /*exports.getDistributorDetails = async (req, res) => {
-    const distributorId = req.session.userId;
+    const distributorId = req.user?.id;
 
     if (!distributorId) {
         return res.status(401).json({ message: "Not authenticated." });

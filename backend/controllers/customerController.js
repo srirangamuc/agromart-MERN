@@ -11,7 +11,7 @@ class CustomerController {
     // Get Customer Dashboard
     async getCustomerDashBoard(req, res) {
         try {
-            const userId = req.session.userId;
+            const userId = req.user?.id;
 
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
@@ -76,7 +76,7 @@ class CustomerController {
       async addToCart(req, res) {
         try {
             const { vendorId, itemName, quantity } = req.body;
-            const userId = req.session.userId;
+            const userId = req.user?.id;
             //  console.log("Fetched data:", vendorId, itemName, quantity ) ;
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
@@ -153,7 +153,7 @@ class CustomerController {
     async deleteFromCart(req, res) {
         try {
             const { itemId, vendorId } = req.params;
-            const userId = req.session.userId;
+            const userId = req.user?.id;
     
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
@@ -185,7 +185,7 @@ class CustomerController {
 
     async getCart(req, res) {
         try {
-            const userId = req.session.userId;
+            const userId = req.user?.id;
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
             }
@@ -237,7 +237,7 @@ class CustomerController {
         // console.log("Fetched data:", req.body);
     
         try {
-            const user = await User.findById(req.session.userId).populate('cart.item');
+            const user = await User.findById(req.user?.id).populate('cart.item');
             if (!user) {
                 return res.status(400).json({ error: 'User not found' });
             }
@@ -520,7 +520,7 @@ await purchase.save();
         try {
             // console.log("📩 Received update-profile request");
     
-            const customerId = req.session.userId;
+            const customerId = req.user?.id;
             // console.log("Session userId:", customerId);
             if (!customerId) {
                 return res.status(401).json({ error: "Unauthorized - User ID not found in session" });
@@ -589,7 +589,7 @@ await purchase.save();
     
     async getProfile(req, res) {
         try {
-            const userId = req.session.userId;
+            const userId = req.user?.id;
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
             }
@@ -621,7 +621,7 @@ await purchase.save();
     
     async getPurchases(req, res) {
         try {
-            const userId = req.session.userId;
+            const userId = req.user?.id;
     
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
@@ -647,7 +647,7 @@ await purchase.save();
     async purchaseSubscription(req, res) {
         const { plan } = req.body; // 'pro' or 'pro plus'
         // console.log(plan)
-        const userId = req.session.userId;
+        const userId = req.user?.id;
     
         try {
             const user = await User.findById(userId);
@@ -694,7 +694,7 @@ await purchase.save();
     
     async successSubscription(req, res) {
         const { plan } = req.query; // 'pro' or 'pro plus'
-        const userId = req.session.userId;
+        const userId = req.user?.id;
     
         try {
             const user = await User.findById(userId);
@@ -912,7 +912,7 @@ class CustomerController {
       async addToCart(req, res) {
         try {
             const { vendorId, itemName, quantity } = req.body;
-            const userId = req.session.userId;
+            const userId = req.user?.id;
             //  console.log("Fetched data:", vendorId, itemName, quantity ) ;
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
@@ -989,7 +989,7 @@ class CustomerController {
     async deleteFromCart(req, res) {
         try {
             const { itemId, vendorId } = req.params;
-            const userId = req.session.userId;
+            const userId = req.user?.id;
     
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
@@ -1028,7 +1028,7 @@ class CustomerController {
 
     async getCart(req, res) {
         try {
-            const userId = req.session.userId;
+            const userId = req.user?.id;
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
             }
@@ -1080,7 +1080,7 @@ class CustomerController {
         // console.log("Fetched data:", req.body);
     
         try {
-            const user = await User.findById(req.session.userId).populate('cart.item');
+            const user = await User.findById(req.user?.id).populate('cart.item');
             if (!user) {
                 return res.status(400).json({ error: 'User not found' });
             }
@@ -1442,7 +1442,7 @@ await purchase.save();
         try {
             // console.log("📩 Received update-profile request");
     
-            const customerId = req.session.userId;
+            const customerId = req.user?.id;
             // console.log("Session userId:", customerId);
             if (!customerId) {
                 return res.status(401).json({ error: "Unauthorized - User ID not found in session" });
@@ -1511,7 +1511,7 @@ await purchase.save();
     
     async getProfile(req, res) {
         try {
-            const userId = req.session.userId;
+            const userId = req.user?.id;
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
             }
@@ -1543,7 +1543,7 @@ await purchase.save();
     
     async getPurchases(req, res) {
         try {
-            const userId = req.session.userId;
+            const userId = req.user?.id;
     
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
@@ -1575,7 +1575,7 @@ await purchase.save();
     async purchaseSubscription(req, res) {
         const { plan } = req.body; // 'pro' or 'pro plus'
         // console.log(plan)
-        const userId = req.session.userId;
+        const userId = req.user?.id;
     
         try {
             const user = await User.findById(userId);
@@ -1622,7 +1622,7 @@ await purchase.save();
     
     async successSubscription(req, res) {
         const { plan } = req.query; // 'pro' or 'pro plus'
-        const userId = req.session.userId;
+        const userId = req.user?.id;
     
         try {
             const user = await User.findById(userId);

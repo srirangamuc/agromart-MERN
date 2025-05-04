@@ -20,7 +20,7 @@ router.post('/',authenticateUser, (req, res) => vendorController.updateProfile(r
 // Route to fetch profit data
 router.get('/profit-data',authenticateUser, async (req, res) => {
     try {
-        const vendorId = req.session.userId;
+        const vendorId = req.user?.id;
 
         // Fetch products for the specific vendor
         const products = await Vendor.find({ vendor: vendorId });

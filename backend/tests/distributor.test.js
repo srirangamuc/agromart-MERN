@@ -55,7 +55,7 @@ describe('DistributorController', () => {
         });
 
         it('should return 401 if not authenticated', async () => {
-            req.session.userId = null;
+            req.user?.id = null;
 
             await distributorController.getDistributorDetails(req, res);
 
@@ -143,7 +143,7 @@ describe('DistributorController', () => {
         });
 
         it('should return 401 if not authenticated', async () => {
-            req.session.userId = null;
+            req.user?.id = null;
 
             await distributorController.updateDistributorInfo(req, res);
 
