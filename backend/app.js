@@ -39,7 +39,13 @@ const upload = multer({ dest: "uploads/" });
 // Middleware
  // Parse JSON requests
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json()); // This helps with JSON payloads
+app.use((req, res, next) => {
+    if (req.is('application/json')) {
+      express.json()(req, res, next);
+    } else {
+      next();
+    }
+  }); // This helps with JSON payloads
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const allowedOrigins = [

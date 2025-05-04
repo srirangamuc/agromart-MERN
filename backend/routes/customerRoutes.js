@@ -43,7 +43,7 @@ router.post('/update-profile', upload.single('profilePicture'), (req, res) => {
     customerController.updateProfile(req, res);
 });
 
-
+ep
 
 // Purchases
 router.get('/purchases',authenticateUser, (req, res) => customerController.getPurchases(req, res));
