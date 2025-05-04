@@ -43,7 +43,7 @@ app.use(express.json()); // This helps with JSON payloads
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.use(cors({ origin: "*", credentials: true }));
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(cookieParser());
 app.use(
     session({
