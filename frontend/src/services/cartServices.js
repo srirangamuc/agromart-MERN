@@ -1,5 +1,6 @@
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
 const BASE_URL = `${API_BASE_URL}/api/customer`; // Local development URL
+import getAuthHeaders from "./helper";
 
 export const cartServices = {
 
@@ -12,9 +13,7 @@ export const cartServices = {
         const response = await fetch(`${BASE_URL}/add-to-cart`, {
             method: 'POST',
             credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify({ itemName, vendorId, quantity }),
         });
 
@@ -76,9 +75,7 @@ export const cartServices = {
         const response = await fetch(`${BASE_URL}/delete-from-cart/${itemId}/${vendorId}`, {
             method: 'DELETE',
             credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getAuthHeaders(),
         });
   
         if (!response.ok) {

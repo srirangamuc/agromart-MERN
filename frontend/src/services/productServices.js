@@ -1,3 +1,5 @@
+import getAuthHeaders from "./helper";
+
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
 const BASE_URL = `${API_BASE_URL}/api/customer`; // Update with your API URL
 
@@ -7,7 +9,10 @@ export const productsService = {
     try {
       const response = await fetch(`${BASE_URL}/products`, {
         method: 'GET',
-        credentials: 'include', // This ensures that cookies are sent with the request
+        headers:{
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }, 
       });
 
       if (!response.ok) {
@@ -55,7 +60,7 @@ async addToCart(itemId, vendorId, quantity) {
       const response = await fetch(`${BASE_URL}/add-to-cart`, {
           method: 'POST',
           credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify({ itemId, vendorId, quantity }),
       });
 
@@ -74,9 +79,7 @@ async addToCart(itemId, vendorId, quantity) {
         const response = await fetch(`${BASE_URL}/delete-from-cart`, {
             method: 'POST',
             credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify({ itemId, vendorId }), // Include vendorId for specific removal
         });
 
@@ -98,9 +101,7 @@ async addToCart(itemId, vendorId, quantity) {
       const response = await fetch(`${BASE_URL}/checkout`, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ cartItems }),
       });
 

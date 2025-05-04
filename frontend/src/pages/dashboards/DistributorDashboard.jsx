@@ -115,7 +115,6 @@ const DistributorDashboard = () => {
         try {
             const response = await fetch("http://localhost:5000/api/distributor", {
                 method: "GET",
-                credentials: "include",
                 headers: { "Content-Type": "application/json" },
             });
 
@@ -351,7 +350,7 @@ const DistributorDashboard = () => {
               <div className="relative h-16 w-16 rounded-full overflow-hidden border-2 border-white mr-4 flex items-center justify-center bg-gray-300">
                 {distributor?.profilePicture ? (
                   <img
-                    src={`http://{}${distributor.profilePicture}`} // Ensure correct path
+                    src={`http://localhost:5000${distributor.profilePicture}`} // Ensure correct path
                     alt="Profile"
                     className="h-16 w-16 rounded-full object-cover"
                     onError={(e) => {
