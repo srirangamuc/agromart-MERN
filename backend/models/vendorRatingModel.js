@@ -7,5 +7,6 @@ const vendorRatingSchema = new mongoose.Schema({
     averageRating: { type: Number, default: 0 },
 });
 
+vendorRatingSchema.index({ vendor: 1 }, { unique: true });
 const VendorRating = mongoose.model('VendorRating', vendorRatingSchema);
 module.exports = VendorRating;

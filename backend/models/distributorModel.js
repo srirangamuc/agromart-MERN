@@ -15,5 +15,8 @@ const distributorSchema = new mongoose.Schema({
     averageRating: { type: Number, default: 0 }
 });
 
+distributorSchema.index({ available:1});
+distributorSchema.index({user:1});
+
 const Distributor = mongoose.model('Distributor', distributorSchema);
 module.exports = Distributor;

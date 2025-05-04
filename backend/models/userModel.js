@@ -46,6 +46,14 @@ const userSchema = new mongoose.Schema({
 
 
 
+userSchema.index({ role: 1, 'address.city': 1 });
+
+userSchema.pre('save', function(next) {
+    if (this.address && this.address.city) {
+        this.address.city = this.address.city.trim().toLowerCase();
+    }
+    next();
+});
 // Create the model from the schema
 const User = mongoose.model('User', userSchema);
 

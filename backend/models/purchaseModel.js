@@ -31,4 +31,6 @@ const purchaseSchema = new mongoose.Schema({
     ]// Store vendor ratings
 });
 
+purchaseSchema.index({ user: 1 });
+purchaseSchema.index({assignedDistributor:1})
 module.exports = mongoose.model('Purchase', purchaseSchema);

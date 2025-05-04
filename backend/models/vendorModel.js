@@ -18,5 +18,11 @@ const vendorSchema = new mongoose.Schema({
     averageRating: { type: Number, default: 0 }
 });
 
+vendorSchema.index({ vendor: 1 });
+vendorSchema.index({ itemName: 1 });
+vendorSchema.index({ timestamp: -1 })
+vendorSchema.index({ itemName: 1 ,timestamp: -1 })
+vendorSchema.index({ itemName: 1 ,vendor: 1 })
+
 const Vendor = mongoose.model('Vendor', vendorSchema);
 module.exports = Vendor;
