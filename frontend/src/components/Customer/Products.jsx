@@ -270,11 +270,12 @@ const ProductsPage = () => {
                   className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 border border-gray-100 group"
                 >
                   <div className="relative p-4 flex justify-center items-center h-48 bg-gradient-to-b from-emerald-50 to-white">
-                    <img
-                      src={`src/assets/images/resized_images/${product.name}.png`}
+                  <img
+                      src={`/images/resized_images/${product.name}.png`}
                       alt={product.name}
                       className="h-36 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
                     />
+
                     {product.quantity <= 0 && (
                       <div className="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                         Sold Out
