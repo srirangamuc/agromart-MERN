@@ -2,6 +2,12 @@
 
 Welcome to AgroMart! AgroMart is a comprehensive multivendor e-commerce platform designed for grocery shopping, where vendors can list their products, and customers can browse, purchase, and manage their orders seamlessly. This README provides an overview of the features and functionalities of the website.
 
+
+## 🌐 Live Demo
+
+- 🔗 [https://agromart-client.onrender.com](https://agromart-client.onrender.com)
+
+
 ## Contributors:
 1. Srirangam Umesh Chandra (SPOC) (S20220010209):
 2. Surapuchetty Abhilash (S20220010216):
