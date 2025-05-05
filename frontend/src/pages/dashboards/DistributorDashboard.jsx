@@ -216,7 +216,6 @@ const DistributorDashboard = () => {
 
         const response = await fetch("https://agromart-backend-kbxx.onrender.com/api/distributor/update-info", {
             method: "POST",
-            credentials: "include",
             body: formDataToSend
         });
 
@@ -249,7 +248,6 @@ const DistributorDashboard = () => {
       try {
         const response = await fetch("https://agromart-backend-kbxx.onrender.com/api/distributor/assigned-purchases", {
           method: "GET",
-          credentials: "include",
           headers:getAuthHeaders()
         })
 
@@ -272,7 +270,6 @@ const DistributorDashboard = () => {
 
       const response = await fetch("https://agromart-backend-kbxx.onrender.com/api/distributor/update-delivery-status", {
         method: "POST",
-        credentials: "include",
         headers:getAuthHeaders(),
         body: JSON.stringify({ purchaseId, status: newStatus }),
       })
