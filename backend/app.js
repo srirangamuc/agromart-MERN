@@ -195,6 +195,9 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/farmer",{
 
 
 // Authentication routes with CSRF protection
+app.get("/",(req,res)=>{
+    res.send("Agromart API is working")
+})
 app.post('/api/login', authController.login);
 app.post('/api/signup', authController.signup);
 app.get('/api/logout', authController.logout);
