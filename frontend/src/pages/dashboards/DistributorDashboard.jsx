@@ -231,7 +231,7 @@ const DistributorDashboard = () => {
             ...prev,
             contactPhone: data.contactPhone,
             address: data.address,
-            profilePicture: `http://localhost:5000${data.profilePicture}`
+            profilePicture: `https://agromart-backend-kbxx.onrender.com${data.profilePicture}`
         }));
 
     } catch (err) {
@@ -349,7 +349,7 @@ const DistributorDashboard = () => {
               <div className="relative h-16 w-16 rounded-full overflow-hidden border-2 border-white mr-4 flex items-center justify-center bg-gray-300">
                 {distributor?.profilePicture ? (
                   <img
-                    src={`http://localhost:5000${distributor.profilePicture}`} // Ensure correct path
+                    src={`https://agromart-backend-kbxx.onrender.com${distributor.profilePicture}`} // Ensure correct path
                     alt="Profile"
                     className="h-16 w-16 rounded-full object-cover"
                     onError={(e) => {
