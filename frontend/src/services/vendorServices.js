@@ -10,7 +10,7 @@ class vendorService {
         try {
             const response = await fetch(`${BASE_URL}/add-product`, {
                 method: 'POST',
-                headers:getAuthHeaders(),
+                headers: getAuthHeaders(),
                 body: JSON.stringify(productData),
             });
 
@@ -90,7 +90,8 @@ class vendorService {
     static async fetchProfile() {
         try {
           const response = await fetch(`${BASE_URL}/profile`, {
-            method: 'GET'
+            method: 'GET',
+            headers:getAuthHeaders()
           });
           console.log(response)
     
