@@ -3,6 +3,7 @@ import { AlertCircle, CheckCircle, Loader2, Star, Truck, Phone, User, LogOut, Ed
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
 import { logout } from "../../redux/authSlice" // Adjust this import path as needed
+import getAuthHeaders from "../../services/helper"
 
 const DistributorDashboard = () => {
   const[profilePicture, setProfilePicture] = useState(null);
@@ -115,7 +116,7 @@ const DistributorDashboard = () => {
         try {
             const response = await fetch("https://agromart-backend-kbxx.onrender.com/api/distributor", {
                 method: "GET",
-                headers: { "Content-Type": "application/json" },
+                headers:getAuthHeaders()
             });
 
             if (!response.ok) {
@@ -161,7 +162,7 @@ const DistributorDashboard = () => {
       setUpdating(true)
       const response = await fetch("https://agromart-backend-kbxx.onrender.com/api/distributor/update-availability", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers:getAuthHeaders()
         body: JSON.stringify({ available: !available }),
       })
 
@@ -249,7 +250,7 @@ const DistributorDashboard = () => {
         const response = await fetch("https://agromart-backend-kbxx.onrender.com/api/distributor/assigned-purchases", {
           method: "GET",
           credentials: "include",
-          headers: { "Content-Type": "application/json" },
+          headers:getAuthHeaders()
         })
 
         if (!response.ok) throw new Error("Failed to fetch assigned purchases")
@@ -272,7 +273,7 @@ const DistributorDashboard = () => {
       const response = await fetch("https://agromart-backend-kbxx.onrender.com/api/distributor/update-delivery-status", {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers:getAuthHeaders()
         body: JSON.stringify({ purchaseId, status: newStatus }),
       })
 
