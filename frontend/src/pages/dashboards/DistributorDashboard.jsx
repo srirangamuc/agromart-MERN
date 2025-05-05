@@ -162,7 +162,7 @@ const DistributorDashboard = () => {
       setUpdating(true)
       const response = await fetch("https://agromart-backend-kbxx.onrender.com/api/distributor/update-availability", {
         method: "POST",
-        headers:getAuthHeaders()
+        headers:getAuthHeaders(),
         body: JSON.stringify({ available: !available }),
       })
 
@@ -273,7 +273,7 @@ const DistributorDashboard = () => {
       const response = await fetch("https://agromart-backend-kbxx.onrender.com/api/distributor/update-delivery-status", {
         method: "POST",
         credentials: "include",
-        headers:getAuthHeaders()
+        headers:getAuthHeaders(),
         body: JSON.stringify({ purchaseId, status: newStatus }),
       })
 
