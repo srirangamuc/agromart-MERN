@@ -4,46 +4,35 @@ const vendorController = require('../controllers/vendorController');
 const Vendor = require('../models/vendorModel');
 const authenticateUser = require("../middleware/authMiddleware");
 
-// Route to add a product
-router.post('/add-product',authenticateUser, (req, res) => vendorController.addProduct(req, res));
+// ✅ Profile Routes
+router.get('/profile', authenticateUser, vendorController.getProfile);
+router.post('/', authenticateUser, vendorController.updateProfile); // Update profile
+router.get('/', authenticateUser, vendorController.getVendorDashboard); // Dashboard (alias for /dashboard)
 
-// Route to fetch products for the vendor
-router.get('/products',authenticateUser, (req, res) => vendorController.getProducts(req, res));
+// ✅ Product Routes
+router.post('/add-product', authenticateUser, vendorController.addProduct);
+router.get('/products', authenticateUser, vendorController.getProducts);
 
-// Route to fetch the vendor dashboard
-router.get('/dashboard',authenticateUser, (req, res) => vendorController.getVendorDashboard(req, res));
-router.get('/profile',authenticateUser,  (req, res) => vendorController.getProfile(req, res));
-// Route to render the vendor page (including the profile section)
-router.get('/',authenticateUser, (req, res) => vendorController.getVendorDashboard(req, res));
-router.post('/',authenticateUser, (req, res) => vendorController.updateProfile(req, res)); // Handle profile updates
+// ✅ Dashboard
+router.get('/dashboard', authenticateUser, vendorController.getVendorDashboard);
 
-// Route to fetch profit data
-router.get('/profit-data',authenticateUser, async (req, res) => {
+// ✅ Profit Data Route
+router.get('/profit-data', authenticateUser, async (req, res) => {
     try {
         const vendorId = req.user?.id;
 
-        // Fetch products for the specific vendor
         const products = await Vendor.find({ vendor: vendorId });
 
-        // Prepare data for the profit chart
-        const profitDataMap = new Map(); // Use a Map to keep track of product profits
+        const profitDataMap = new Map();
 
         products.forEach(product => {
-            if (profitDataMap.has(product.itemName)) {
-                // Update profit if product already exists
-                const existingProfit = profitDataMap.get(product.itemName);
-                profitDataMap.set(product.itemName, existingProfit + product.profit);
-            } else {
-                // Add new product to the Map
-                profitDataMap.set(product.itemName, product.profit);
-            }
+            const currentProfit = profitDataMap.get(product.itemName) || 0;
+            profitDataMap.set(product.itemName, currentProfit + product.profit);
         });
 
-        // Convert the Map to arrays for response
         const productNames = Array.from(profitDataMap.keys());
         const profits = Array.from(profitDataMap.values());
 
-        // Send the data as JSON response
         res.json({ productNames, profits });
     } catch (error) {
         console.error('Error fetching profit data:', error);
@@ -51,9 +40,8 @@ router.get('/profit-data',authenticateUser, async (req, res) => {
     }
 });
 
-// Vendor rating route
+// ✅ Vendor Rating
 router.post('/rate-vendor', authenticateUser, vendorController.rateVendor);
-router.get('/rating',authenticateUser, vendorController.getVendorRating);
-
+router.get('/rating', authenticateUser, vendorController.getVendorRating);
 
 module.exports = router;
