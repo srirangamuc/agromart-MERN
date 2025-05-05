@@ -1,3 +1,5 @@
+import getAuthHeaders from "./helper";
+
 // services/vendorService.js
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
 const BASE_URL = `${API_BASE_URL}/api/vendor`; // Base URL for vendor endpoints
@@ -8,10 +10,7 @@ class vendorService {
         try {
             const response = await fetch(`${BASE_URL}/add-product`, {
                 method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers:getAuthHeaders(),
                 body: JSON.stringify(productData),
             });
 
@@ -32,10 +31,7 @@ class vendorService {
         try {
             const response = await fetch(`${BASE_URL}/products`, {
                 method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers:getAuthHeaders(),
             });
 
             if (!response.ok) {
@@ -55,10 +51,7 @@ class vendorService {
         try {
             const response = await fetch(`${BASE_URL}/dashboard`, {
                 method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers:getAuthHeaders(),
             });
 
             if (!response.ok) {
@@ -79,10 +72,7 @@ class vendorService {
             console.log(profileData)
             const response = await fetch(`${BASE_URL}/`, {
                 method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers:getAuthHeaders(),
                 body: JSON.stringify(profileData),
             });
 
@@ -100,8 +90,7 @@ class vendorService {
     static async fetchProfile() {
         try {
           const response = await fetch(`${BASE_URL}/profile`, {
-            method: 'GET',
-            credentials: 'include',
+            method: 'GET'
           });
           console.log(response)
     
@@ -120,10 +109,7 @@ class vendorService {
         try {
             const response = await fetch(`${BASE_URL}/profit-data`, {
                 method: 'GET',   
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers:getAuthHeaders(),
             });
 
             if (!response.ok) {
@@ -141,10 +127,7 @@ class vendorService {
         try {
             const response = await fetch(`${BASE_URL}/rating`, {
                 method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers:getAuthHeaders(),
             });
 
             if (!response.ok) {
