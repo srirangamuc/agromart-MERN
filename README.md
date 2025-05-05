@@ -5,7 +5,7 @@ Welcome to AgroMart! AgroMart is a comprehensive multivendor e-commerce platform
 
 ## 🌐 Live Demo
 
-- 🔗 [https://agromart-client.onrender.com](https://agromart-mern-frontend.onrender.com)
+- 🔗 [https://agromart-mern-frontend.onrender.com](https://agromart-mern-frontend.onrender.com)
 
 
 ## Contributors:
