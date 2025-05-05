@@ -137,7 +137,7 @@ const accessLogStream = {
 // Basic middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
+app.use(express.json())
 app.use('/api/vendor', vendorRoutes);
 app.use('/api/customer', customerRoutes);
 app.use('/api/admin', adminRoutes);
@@ -149,8 +149,6 @@ app.use("/api/distributor", distributorRoutes);
   
 //     }
 // });
-
-app.use(express.json())
 
 // Logging middleware
 app.use(morgan(':custom')); // Console logging

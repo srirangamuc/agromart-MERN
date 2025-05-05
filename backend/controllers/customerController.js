@@ -929,7 +929,7 @@ class CustomerController {
             if (!item) {
                 return res.status(404).json({ error: 'Item not found' });
             }
-        var itemId = item._id;
+            var itemId = item._id;
         // console.log("Item Id:", itemId);
             // Fetch the vendor details
             const vendorItem = await Vendor.findById(vendorId);
