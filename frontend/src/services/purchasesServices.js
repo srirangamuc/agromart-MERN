@@ -1,6 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
 const API_DISTRIBUTOR_URL = `${API_BASE_URL}/api/distributor`; 
 const API_VENDOR_URL = `${API_BASE_URL}/api/vendor`;  
+import getAuthHeaders from "./helper"
 
 export const purchasesService = {
     rateDistributor: async (purchaseId, rating) => {
@@ -30,14 +31,9 @@ export const purchasesService = {
     // ✅ Fixed: Use API_VENDOR_URL instead of undefined API_URL
     rateVendor: async (purchaseId, vendorId, rating) => {
         try {
-            const token = localStorage.getItem("token");
-
             const response = await fetch(`${API_VENDOR_URL}/rate-vendor`, {  // ✅ Correct API URL
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: getAuthHeaders(),
                 body: JSON.stringify({ purchaseId, vendorId, rating }),
             });
 
