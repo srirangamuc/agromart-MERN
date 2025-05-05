@@ -113,7 +113,7 @@ const DistributorDashboard = () => {
   useEffect(() => {
     const fetchDistributor = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/distributor", {
+            const response = await fetch("https://agromart-backend-kbxx.onrender.com/api/distributor", {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
             });
@@ -130,7 +130,7 @@ const DistributorDashboard = () => {
 
             // ✅ Safely check if profilePicture exists inside user
             if (data?.user?.profilePicture) {
-                setProfilePicture(`http://localhost:5000${data.user.profilePicture}`);
+                setProfilePicture(`https://agromart-backend-kbxx.onrender.com${data.user.profilePicture}`);
             } else {
                 setProfilePicture(null);
             }
@@ -159,7 +159,7 @@ const DistributorDashboard = () => {
   const updateAvailability = async () => {
     try {
       setUpdating(true)
-      const response = await fetch("http://localhost:5000/api/distributor/update-availability", {
+      const response = await fetch("https://agromart-backend-kbxx.onrender.com/api/distributor/update-availability", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ available: !available }),
@@ -213,7 +213,7 @@ const DistributorDashboard = () => {
             formDataToSend.append("profilePicture", profilePicture);
         }
 
-        const response = await fetch("http://localhost:5000/api/distributor/update-info", {
+        const response = await fetch("https://agromart-backend-kbxx.onrender.com/api/distributor/update-info", {
             method: "POST",
             credentials: "include",
             body: formDataToSend
@@ -246,7 +246,7 @@ const DistributorDashboard = () => {
   useEffect(() => {
     const fetchAssignedPurchases = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/distributor/assigned-purchases", {
+        const response = await fetch("https://agromart-backend-kbxx.onrender.com/api/distributor/assigned-purchases", {
           method: "GET",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -269,7 +269,7 @@ const DistributorDashboard = () => {
     try {
       setUpdatingStatus(true)
 
-      const response = await fetch("http://localhost:5000/api/distributor/update-delivery-status", {
+      const response = await fetch("https://agromart-backend-kbxx.onrender.com/api/distributor/update-delivery-status", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
