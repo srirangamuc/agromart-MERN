@@ -329,6 +329,10 @@ const allowedProducts = [
 
 class VendorController {
     // Function to add a new product
+    capitalizeFirstLetter(string) {
+        if (!string) return '';
+        return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    }
     async addProduct(req, res) {
         try {
             let { name, quantity, pricePerKg } = req.body;
@@ -549,10 +553,7 @@ class VendorController {
         }
       }
     // Capitalize only the first letter
-    capitalizeFirstLetter(string) {
-        if (!string) return '';
-        return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-    }
+    
 
 
     // new Method regarding Vendor Rating.
