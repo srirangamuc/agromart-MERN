@@ -1510,8 +1510,8 @@ await purchase.save();
             });
     
         } catch (error) {
-            // console.error("❌ Error updating profile:", error);
-            res.status(500).json({ error: "Failed to update profile" });
+            console.error("❌ Error updating profile:", error);
+            res.status(500).json({ error: "Failed to update profile" ,details:error.message});
         }
     }
     

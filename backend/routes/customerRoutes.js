@@ -34,25 +34,34 @@ router.post('/checkout',authenticateUser, (req, res) => customerController.check
 router.get('/profile',authenticateUser, (req, res) => customerController.getProfile(req, res));
 
 // ⛔ If using Express Router:
-// router.post(
-//     '/update-profile',
-//     authenticateUser,
-//     upload.single('profilePicture'), // <-- call it directly
-//     customerController.updateProfile
-//   );
+router.post(
+    '/update-profile',
+    authenticateUser,
+    upload.single('profilePicture'), // <-- call it directly
+    customerController.updateProfile
+  );
 
+<<<<<<< Updated upstream
 router.post("/update-profile", upload.single("profilePicture"), (req, res) => {
     if (req.file) {
       console.log("File uploaded:", req.file);
     } else {
       console.error("No file received");
     }
+=======
+// app.post("/update-profile", upload.single("profilePicture"), (req, res) => {
+//     if (req.file) {
+//       console.log("File uploaded:", req.file);
+//     } else {
+//       console.error("No file received");
+//     }
+>>>>>>> Stashed changes
   
-    // Handle other form data
-    const { name, email } = req.body; // Example of other form fields
+//     // Handle other form data
+//     const { name, email } = req.body; // Example of other form fields
   
-    res.json({ success: true, user: { name, email } });
-  });
+//     res.json({ success: true, user: { name, email } });
+//   });
 
 // Purchases
 router.get('/purchases',authenticateUser, (req, res) => customerController.getPurchases(req, res));
