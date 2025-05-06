@@ -39,9 +39,10 @@ router.get('/profile',authenticateUser, (req, res) => customerController.getProf
 
 
 // ⛔ If using Express Router:
-router.post('/update-profile', upload.single('profilePicture'), (req, res) => {
+router.post('/update-profile', authenticateUser, upload.single('profilePicture'), (req, res) => {
     customerController.updateProfile(req, res);
 });
+
 
 // Purchases
 router.get('/purchases',authenticateUser, (req, res) => customerController.getPurchases(req, res));
