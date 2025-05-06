@@ -41,7 +41,7 @@ router.get('/profile',authenticateUser, (req, res) => customerController.getProf
 //     customerController.updateProfile
 //   );
 
-app.post("/update-profile", upload.single("profilePicture"), (req, res) => {
+router.post("/update-profile", upload.single("profilePicture"), (req, res) => {
     if (req.file) {
       console.log("File uploaded:", req.file);
     } else {
