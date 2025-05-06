@@ -1591,7 +1591,7 @@ await purchase.save();
               return res.status(404).json({ message: 'User not found' });
             }
         
-            return res.json({ tier: user.subscriptionTier || 'free' }); // or however you track subscriptions
+            return res.json({ tier: user.subscription || 'free' }); // or however you track subscriptions
           } catch (error) {
             console.error('Error fetching current subscription:', error);
             return res.status(500).json({ message: 'Server error' });
