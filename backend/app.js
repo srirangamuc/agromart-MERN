@@ -1,11 +1,8 @@
 const express = require("express");
-const bodyparser = require('body-parser');
 const mongoose = require("mongoose");
 const session = require('express-session');
-const bodyParser = require('body-parser');
 const cors = require("cors");
 const morgan = require("morgan");
-const colors = require('colors');
 const cookieParser = require('cookie-parser');
 const authController = require('./controllers/authController');
 const csrf = require("csurf");
@@ -56,13 +53,17 @@ const allowedOrigins = [
     ],
   }));
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+app.use(express.static('public'));
+app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Serve uploaded files
+
+
+// Request parsers
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
+app.use(cookieParser());
  // Parse JSON requests
 
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use(cookieParser());
 app.use(
     session({
         secret: process.env.SESSION_SECRET || "secretkey", // Use environment variable for security
@@ -135,15 +136,8 @@ const accessLogStream = {
 };
 
 // Basic middleware
-app.use(express.json({ limit: '10mb' }));
 
-app.use(express.urlencoded({ limit : '10mb' , extended: true }));
 
-// Limit request body size to 10MB
-app.use('/api/vendor', vendorRoutes);
-app.use('/api/customer', customerRoutes);
-app.use('/api/admin', adminRoutes);
-app.use("/api/distributor", distributorRoutes);
 
 // const csrfProtection = csrf({
 //     cookie: {
@@ -185,8 +179,24 @@ app.use((req, res, next) => {
 });
 
 // Static files and view engine setup
-app.use(express.static('public'));
-app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Serve uploaded files
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+app.post('/api/login', authController.login);
+app.post('/api/signup', authController.signup);
+app.get('/api/logout', authController.logout);
+
+
+
+
+// API routes with CSRF protection
+
+
+// Limit request body size to 10MB
+app.use('/api/vendor', vendorRoutes);
+app.use('/api/customer', customerRoutes);
+app.use('/api/admin', adminRoutes);
+app.use("/api/distributor", distributorRoutes);
+
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/farmer",{autoIndex:true})
@@ -200,11 +210,7 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/farmer",{
 app.get("/",(req,res)=>{
     res.send("Agromart API is working")
 })
-app.post('/api/login', authController.login);
-app.post('/api/signup', authController.signup);
-app.get('/api/logout', authController.logout);
 
-// API routes with CSRF protection
 
 
 // app.use((err, req, res, next) => {
