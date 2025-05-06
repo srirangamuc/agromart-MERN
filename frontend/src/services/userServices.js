@@ -28,7 +28,7 @@ async updateProfile(profileData) {
         const response = await fetch(`${BASE_URL}/update-profile`, {
             method: "POST",
             headers:getAuthHeaders(),
-            body: profileData, // FormData object
+            body: JSON.stringify(profileData) // FormData object
         });
 
         console.log(response)
