@@ -24,6 +24,7 @@ import vendorService from "../../services/vendorServices"
 import { logout } from "../../redux/authSlice"
 import { useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
+import {toast} from 'react-toastify'
 
 // Register ChartJS components
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
@@ -49,7 +50,7 @@ const VendorDashboard = () => {
     quantity: "",
     pricePerKg: "",
   })
-  const [error, setError] = useState(null)
+  // const [error, setError] = useState(null)
   const [rating, setRating] = useState(null);
   const [vendorProfile, setVendorProfile] = useState(null)
   const [isEditingProfile, setIsEditingProfile] = useState(false)
@@ -110,7 +111,7 @@ const VendorDashboard = () => {
         setVendorProfile(vendorProfileResponse)
         setProfitData(profitResponse)
       } catch (err) {
-        setError("Failed to fetch data. Please log in again.")
+        toast("Failed to fetch data. Please log in again.")
         console.error(err)
       }
     }
@@ -130,7 +131,14 @@ const VendorDashboard = () => {
 
       setProductForm({ name: "", quantity: "", pricePerKg: "" })
     } catch (err) {
-      setError("Failed to add product")
+      toast.error(err, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });      
       console.error(err)
     }
   }
@@ -144,7 +152,14 @@ const VendorDashboard = () => {
       setVendorProfile(updatedProfile)
       setIsEditingProfile(false)
     } catch (err) {
-      setError("Failed to update profile")
+      toast.error(err, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       console.error(err)
     }
   }
@@ -172,8 +187,7 @@ const VendorDashboard = () => {
   ]
 
   // Render loading or error state
-  if (error) return <div className="text-red-500 p-6">{error}</div>
-  if (!vendorData)
+if (!vendorData)
     return (
       <div className="min-h-screen bg-emerald-50 flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center">
