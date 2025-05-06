@@ -27,10 +27,9 @@ async updateProfile(profileData) {
     try {
         const response = await fetch(`${BASE_URL}/update-profile`, {
             method: "POST",
-            /*headers: {
+            headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },*/
-            credentials : 'include',
+            },
             body: profileData, // FormData object
         });
 
