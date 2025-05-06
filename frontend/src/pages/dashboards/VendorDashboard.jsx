@@ -131,14 +131,7 @@ const VendorDashboard = () => {
 
       setProductForm({ name: "", quantity: "", pricePerKg: "" })
     } catch (err) {
-      toast.error(err, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });      
+      toast.error(err);      
       console.error(err)
     }
   }
@@ -152,14 +145,7 @@ const VendorDashboard = () => {
       setVendorProfile(updatedProfile)
       setIsEditingProfile(false)
     } catch (err) {
-      toast.error(err, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.error(err);
       console.error(err)
     }
   }
