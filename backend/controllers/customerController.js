@@ -1478,15 +1478,22 @@ await purchase.save();
             // console.log("📁 Uploaded file:", req.file);
     
             // Handle profile picture upload
-            if (req.file && req.file.path) {
+            if (req.file) {
+                console.log("✅ File uploaded to Cloudinary:", req.file);
+            
                 const allowedTypes = ["image/png", "image/jpg", "image/jpeg", "image/webp"];
                 if (!allowedTypes.includes(req.file.mimetype)) {
                     return res.status(400).json({ error: "Invalid file type. Only PNG, JPG, JPEG, and WEBP are allowed." });
                 }
-    
-                // Cloudinary URL is stored directly
-                customer.profilePicture = req.file.path;
+            
+                // Use .path (Cloudinary gives the full URL in .path)
+                if (req.file.path) {
+                    customer.profilePicture = req.file.path;
+                } else {
+                    return res.status(500).json({ error: "Image upload failed: No Cloudinary URL found." });
+                }
             }
+            
     
             // Save updated customer data
             await customer.save();
