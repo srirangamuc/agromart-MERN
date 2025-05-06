@@ -1442,8 +1442,8 @@ await purchase.save();
         try {
             console.log("📩 Received update-profile request");
     
-            const customerId = req.user?.id;
-            // const customerId = req.user?._id || req.user?.id;
+            // const customerId = req.user?.id;
+            const customerId = req.user?._id || req.user?.id;
 
             console.log("Session userId:", customerId);
             if (!customerId) {
