@@ -45,7 +45,6 @@ router.get('/purchases',authenticateUser, (req, res) => customerController.getPu
 // Subscription
 router.post('/subscribe',authenticateUser,(req, res) => customerController.purchaseSubscription(req, res));
 
-router.get('/current-subscription', authenticateUser, (req, res) => customerController.getCurrentSubscription(req, res));
 
 // Success Subscription
 router.get('/success-subscription',authenticateUser, (req, res) => customerController.successSubscription(req, res));
