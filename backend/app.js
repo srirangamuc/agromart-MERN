@@ -413,6 +413,7 @@ app.use("/api/vendor", vendorRoutes);
 app.use("/api/customer", customerRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/distributor", distributorRoutes);
+app.use("/api/test",require("./routes/testUpload"));
 
 // MongoDB connection
 mongoose
