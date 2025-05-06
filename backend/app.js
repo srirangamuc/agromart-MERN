@@ -1,7 +1,8 @@
-const express = require("express");
+/*const express = require("express");
 const mongoose = require("mongoose");
 const session = require('express-session');
 const cors = require("cors");
+const colors = require("colors");
 const morgan = require("morgan");
 const cookieParser = require('cookie-parser');
 const authController = require('./controllers/authController');
@@ -244,4 +245,199 @@ app.use((err, req, res, next) => {
 //     appendToLog(getLogFilename('server'), `Server started on port ${PORT}`);
 // });
 
-module.exports = app
+module.exports = app; // Export the app for testing purposes*/
+
+const express = require("express");
+const mongoose = require("mongoose");
+const session = require("express-session");
+const cors = require("cors");
+const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
+const authController = require("./controllers/authController");
+const dotenv = require("dotenv");
+const fs = require("fs");
+const path = require("path");
+
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
+const swaggerDocument = YAML.load("./swagger.yaml");
+
+const vendorRoutes = require("./routes/vendorRoutes");
+const customerRoutes = require("./routes/customerRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const distributorRoutes = require("./routes/distributorRoutes");
+
+const app = express();
+
+// Load environment variables
+dotenv.config();
+
+// CORS Configuration
+const allowedOrigins = [
+  "https://agromart-mern-frontend.onrender.com",
+  "http://localhost:5173",
+  "http://localhost/"
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      callback(new Error("Not allowed by CORS"));
+    },
+    allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  })
+);
+
+// Serve static files
+app.use(express.static("public"));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Request parsers
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(cookieParser());
+
+// Session setup
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "secretkey",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 86400000,
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    },
+  })
+);
+
+// Create logs directory
+const logDirectory = path.join(__dirname, "logs");
+if (!fs.existsSync(logDirectory)) {
+  fs.mkdirSync(logDirectory);
+}
+
+// Log file helper
+const getLogFilename = (prefix) => {
+  const date = new Date().toISOString().split("T")[0];
+  return path.join(logDirectory, `${prefix}-${date}.log`);
+};
+
+const appendToLog = (filename, data) => {
+  const timestamp = new Date().toISOString();
+  fs.appendFileSync(filename, `${timestamp} - ${data}\n`, { flag: "a" });
+};
+
+// Morgan custom token without colors for safe logging
+morgan.token("custom", (req, res) => {
+  const method = req.method;
+  const url = req.url;
+  const status = res.statusCode;
+  const responseTime = res.responseTime || 0;
+  const timestamp = new Date().toLocaleString();
+
+  return [
+    `Method: ${method}`,
+    `URL: ${url}`,
+    `Status: ${status}`,
+    `Response Time: ${responseTime}ms`,
+    `Time: ${timestamp}`
+  ].join(" | ");
+});
+
+morgan.token("file-format", (req, res) => {
+  const method = req.method;
+  const url = req.url;
+  const status = res.statusCode;
+  const responseTime = res.responseTime || 0;
+  const timestamp = new Date().toLocaleString();
+
+  return [
+    `Method: ${method}`,
+    `URL: ${url}`,
+    `Status: ${status}`,
+    `Response Time: ${responseTime}ms`,
+    `Time Stamp: ${timestamp}`
+  ].join(" | ");
+});
+
+// Morgan log stream for file
+const accessLogStream = {
+  write: (message) => {
+    fs.appendFileSync(getLogFilename("access"), message);
+  },
+};
+
+// Logging middleware
+app.use(morgan(":custom")); // Console
+app.use(morgan(":file-format", { stream: accessLogStream })); // File
+
+// Error logging middleware
+app.use((req, res, next) => {
+  const originalSend = res.send;
+  res.send = function (data) {
+    if (res.statusCode >= 400) {
+      const errorLog = {
+        timestamp: new Date().toISOString(),
+        method: req.method,
+        url: req.url,
+        status: res.statusCode,
+        body: req.body,
+        query: req.query,
+        params: req.params,
+        error: data,
+      };
+      appendToLog(getLogFilename("error"), JSON.stringify(errorLog));
+    }
+    return originalSend.call(this, data);
+  };
+  next();
+});
+
+// Swagger docs
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// Auth endpoints
+app.post("/api/login", authController.login);
+app.post("/api/signup", authController.signup);
+app.get("/api/logout", authController.logout);
+
+// API routes
+app.use("/api/vendor", vendorRoutes);
+app.use("/api/customer", customerRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/distributor", distributorRoutes);
+
+// MongoDB connection
+mongoose
+  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/farmer", {
+    autoIndex: true,
+  })
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => {
+    console.error("Local Database connection error", err);
+  });
+
+// Health check route
+app.get("/", (req, res) => {
+  res.send("Agromart API is working");
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  appendToLog(getLogFilename("server-errors"), err.stack);
+
+  res.status(500).json({
+    error: "Internal Server Error",
+    message: process.env.NODE_ENV === "development" ? err.message : "Something went wrong!",
+  });
+});
+
+module.exports = app;
