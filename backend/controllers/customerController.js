@@ -1582,7 +1582,7 @@ await purchase.save();
 
     async getCurrentSubscription(req,res) {
         try {
-            const userId = req.user.id; // Assuming you're attaching user info in `authMiddleware`
+            const userId = req.user?.id; // Assuming you're attaching user info in `authMiddleware`
             
             // Example: Fetch from your database, adjust this to match your DB schema
             const user = await Customer.findById(userId);
