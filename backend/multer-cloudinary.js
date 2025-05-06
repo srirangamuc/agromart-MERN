@@ -5,12 +5,13 @@ const cloudinary = require('./cloudinary');
 console.log("⛅ Cloudinary config:", cloudinary.config()); // Log it
 
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
+  cloudinary,
+  params: async (req, file) => ({
     folder: 'agromart_profiles',
-    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+    format: file.mimetype.split('/')[1], // or fixed: 'jpg'
+    public_id: `${Date.now()}-${file.originalname}`,
     transformation: [{ quality: 'auto' }],
-  },
+  }),
 });
 
 const upload = multer({
