@@ -66,13 +66,16 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { registerUser } from "../../services/authServices";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"; // Import toast
+
+// Make sure to import the CSS for react-toastify in your main app file (e.g., App.js)
+import 'react-toastify/dist/ReactToastify.css';
 
 const SignupForm = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [role, setRole] = useState("customer");
-    const [showPasswordWarning, setShowPasswordWarning] = useState(false);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -81,11 +84,15 @@ const SignupForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Check if password is valid
         if (!passwordRegex.test(password)) {
-            setShowPasswordWarning(true);
-            return;
+            // Show toast notification if password is invalid
+            toast.error("Password must be at least 8 characters, contain 1 uppercase letter, 1 number, and 1 special character.");
+            return; // Block the form submission
         }
-        setShowPasswordWarning(false);
+
+        // Proceed with registration if password is valid
         const result = await registerUser(name, email, password, role, dispatch);
         if (result.success && result.shouldRedirect) {
             navigate('/login');
@@ -113,19 +120,9 @@ const SignupForm = () => {
                 type="password"
                 placeholder="Password (Min 8 chars, 1 uppercase, 1 number, 1 special)"
                 value={password}
-                onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (showPasswordWarning) {
-                        setShowPasswordWarning(!passwordRegex.test(e.target.value));
-                    }
-                }}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2 mb-1 border rounded"
             />
-            {showPasswordWarning && (
-                <p className="text-red-500 text-sm mb-2">
-                    Password must be at least 8 characters, contain 1 uppercase letter, 1 number, and 1 special character.
-                </p>
-            )}
             <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
