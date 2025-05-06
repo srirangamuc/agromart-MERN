@@ -43,6 +43,23 @@ async updateProfile(profileData) {
 },
 
 
+async getCurrentSubscription() {
+  try {
+    const response = await fetch(`${BASE_URL}/subscription`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch current subscription');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching subscription:', error.message);
+    throw new Error('Failed to fetch current subscription. Please try again.');
+  }
+},
 
 
   // Handle other actions like purchasing subscriptions, etc.
