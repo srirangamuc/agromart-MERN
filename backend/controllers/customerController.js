@@ -1355,8 +1355,8 @@ await purchase.save();
                             quantity: 1,
                         }],
                         mode: 'payment',
-                        success_url: `http://localhost:5173/success`,
-                        cancel_url: `http://localhost:5173/cancel`,
+                        success_url: `https://agromart-mern-frontend.onrender.com/success`,
+                        cancel_url: `https://agromart-mern-frontend.onrender.com/cancel`,
                     });
     
                     res.json({ sessionUrl: session.url });
@@ -1608,8 +1608,8 @@ await purchase.save();
                     quantity: 1,
                 }],
                 mode: 'payment',
-                success_url: `http://localhost:5173/success`,
-                cancel_url: `http://localhost:5173/cancel`,
+                success_url: `https://agromart-mern-frontend.onrender.com/success`,
+                cancel_url: `https://agromart-mern-frontend.onrender.com/cancel`,
 
             });
             user.subscription= plan; // Assuming `subscriptionPlan` is a field in the `User` schema
