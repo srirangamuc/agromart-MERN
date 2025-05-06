@@ -333,7 +333,7 @@ function capitalizeFirstLetter(string) {
 }
 class VendorController {
     // Function to add a new product
-    async addProduct(req, res) {
+    /*async addProduct(req, res) {
         try {
             let { name, quantity, pricePerKg } = req.body;
             const vendorId = req.user?.id;
@@ -391,7 +391,75 @@ class VendorController {
             console.error('Error adding product:', error);
             res.status(500).json({ error: 'Server error' });
         }
-    }
+    }*/
+        async addProduct(req, res) {
+            try {
+                let { name, quantity, pricePerKg } = req.body;
+                const vendorId = req.user?.id;
+        
+                // Convert quantity and pricePerKg to numbers
+                quantity = parseInt(quantity, 10);
+                pricePerKg = parseFloat(pricePerKg);
+        
+                const MIN_PRICE = 10;
+                const MAX_PRICE = 500;
+        
+                if (!name || isNaN(quantity) || isNaN(pricePerKg) || !vendorId) {
+                    return res.status(400).json({ error: 'All fields are required and must be valid numbers. Vendor must be logged in.' });
+                }
+        
+                if (pricePerKg < MIN_PRICE || pricePerKg > MAX_PRICE) {
+                    return res.status(400).json({
+                        error: `Price per kg must be between ₹${MIN_PRICE} and ₹${MAX_PRICE}.`
+                    });
+                }
+        
+                name = capitalizeFirstLetter(name);
+        
+                if (!allowedProducts.includes(name)) {
+                    return res.status(400).json({ error: 'Product is not allowed. Please select from the list of allowed fruits and vegetables.' });
+                }
+        
+                // Update or create the product in the Item model (global)
+                const existingProduct = await Item.findOne({ name });
+                if (existingProduct) {
+                    const newTotalPrice = (existingProduct.pricePerKg + pricePerKg) / 2;
+                    existingProduct.pricePerKg = newTotalPrice;
+                    existingProduct.quantity += quantity;
+                    await existingProduct.save();
+                } else {
+                    const newItem = new Item({ name, quantity, pricePerKg });
+                    await newItem.save();
+                }
+        
+                // Update or create the product in the Vendor model (vendor-specific)
+                const existingVendorProduct = await Vendor.findOne({ vendor: vendorId, itemName: name });
+        
+                if (existingVendorProduct) {
+                    const newAvgPrice = (existingVendorProduct.pricePerKg + pricePerKg) / 2;
+                    existingVendorProduct.quantity += quantity;
+                    existingVendorProduct.pricePerKg = newAvgPrice;
+                    await existingVendorProduct.save();
+                } else {
+                    const vendorItem = new Vendor({
+                        vendor: vendorId,
+                        itemName: name,
+                        quantity,
+                        pricePerKg,
+                        quantitySold: 0,
+                        profit: 0,
+                        timestamp: Date.now(),
+                    });
+                    await vendorItem.save();
+                }
+        
+                res.status(200).json({ message: 'Product added or updated successfully' });
+            } catch (error) {
+                console.error('Error adding product:', error);
+                res.status(500).json({ error: 'Server error' });
+            }
+        }
+        
 
     // Function to fetch products for the vendor
     async getProducts(req, res) {
