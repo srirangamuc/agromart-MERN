@@ -327,12 +327,12 @@ const allowedProducts = [
     "Eggplant", "Potato", "Sweet Potato", "Onion", "Garlic", "Radish", "Beetroot"
 ];
 
+function capitalizeFirstLetter(string) {
+    if (!string) return '';
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
 class VendorController {
     // Function to add a new product
-    capitalizeFirstLetter(string) {
-        if (!string) return '';
-        return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-    }
     async addProduct(req, res) {
         try {
             let { name, quantity, pricePerKg } = req.body;
@@ -356,7 +356,7 @@ class VendorController {
                 })
             }
 
-            name = this.capitalizeFirstLetter(name);
+            name = capitalizeFirstLetter(name);
 
             if (!allowedProducts.includes(name)) {
                 return res.status(400).json({ error: 'Product is not allowed. Please select from the list of allowed fruits and vegetables.' });
