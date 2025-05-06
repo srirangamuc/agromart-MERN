@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+
 import { useNavigate } from 'react-router-dom';
 import { userService } from '../../services/userServices';
 import { 
@@ -77,7 +79,7 @@ const SubscriptionPage = () => {
     fetchSubscription();
   }, []);
 
-  const handleSubscribe = async (plan) => {
+/*  const handleSubscribe = async (plan) => {
     setLoading(true);
     setError(null);
     setSelectedPlan(plan);
@@ -100,7 +102,46 @@ const SubscriptionPage = () => {
     } finally {
       setLoading(false);
     }
+  };*/
+
+  const handleSubscribe = async (plan) => {
+    setLoading(true);
+    setError(null);
+    setSelectedPlan(plan);
+  
+    try {
+      // Case: Already on Pro and trying to re-purchase Pro or downgrade
+      if (currentSubscription?.tier === 'pro' && (plan === 'pro' || plan === 'free')) {
+        toast.info('You are already a Pro customer!');
+        setLoading(false);
+        return;
+      }
+  
+      // Case: Already on Pro Plus and trying to re-purchase anything
+      if (currentSubscription?.tier === 'pro plus') {
+        toast.info('You are already a Pro Plus customer!');
+        setLoading(false);
+        return;
+      }
+  
+      // Case: Trying to buy the same plan again
+      if (plan === currentSubscription?.tier) {
+        navigate('/account/manage-subscription');
+        return;
+      }
+  
+      // Valid new purchase
+      const { sessionUrl } = await userService.purchaseSubscription(plan);
+      window.location.href = sessionUrl;
+  
+    } catch (err) {
+      console.error('Error during subscription:', err.message);
+      toast.error('Failed to initiate subscription. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
+  
 
   const handleCancelSubscription = async () => {
     try {
