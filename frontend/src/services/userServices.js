@@ -45,7 +45,7 @@ async updateProfile(profileData) {
 
 async getCurrentSubscription() {
   try {
-    const response = await fetch(`${BASE_URL}/subscription`, {
+    const response = await fetch(`${BASE_URL}/current-subscription`, {
       method: 'GET',
       headers: getAuthHeaders(),
     });

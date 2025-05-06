@@ -1579,6 +1579,24 @@ await purchase.save();
     async getFailure(req, res) {
         res.json({ message: 'Payment failed' }); // JSON response instead of rendering failure page
     }
+
+    async getCurrentSubscription(req,res) {
+        try {
+            const userId = req.user.id; // Assuming you're attaching user info in `authMiddleware`
+            
+            // Example: Fetch from your database, adjust this to match your DB schema
+            const user = await Customer.findById(userId);
+        
+            if (!user) {
+              return res.status(404).json({ message: 'User not found' });
+            }
+        
+            return res.json({ tier: user.subscriptionTier || 'free' }); // or however you track subscriptions
+          } catch (error) {
+            console.error('Error fetching current subscription:', error);
+            return res.status(500).json({ message: 'Server error' });
+          }
+    }
     
     async purchaseSubscription(req, res) {
         const { plan } = req.body; // 'pro' or 'pro plus'
