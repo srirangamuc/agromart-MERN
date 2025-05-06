@@ -39,17 +39,12 @@ router.get('/profile',authenticateUser, (req, res) => customerController.getProf
 
 
 // ⛔ If using Express Router:
-router.post('/update-profile', authenticateUser, (req, res, next) => {
-    upload.single('profilePicture')(req, res, (err) => {
-        if (err) {
-            console.error('Multer error:', err);
-            return res.status(400).json({ error: 'File upload error: ' + err.message });
-        }
-        next();
-    });
-}, (req, res) => {
-    customerController.updateProfile(req, res);
-});
+router.post(
+    '/update-profile',
+    authenticateUser,
+    upload.single('profilePicture'), // <-- call it directly
+    customerController.updateProfile
+  );
 
 // Purchases
 router.get('/purchases',authenticateUser, (req, res) => customerController.getPurchases(req, res));
