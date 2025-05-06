@@ -548,9 +548,10 @@ class VendorController {
           return res.status(500).json({ error: 'Something went wrong. Please try again.' }); // General error handling
         }
       }
-    // Helper function to capitalize the first letter of each word
+    // Capitalize only the first letter
     capitalizeFirstLetter(string) {
-        return string.replace(/\b\w/g, char => char.toUpperCase());
+        if (!string) return '';
+        return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
 
 
