@@ -33,6 +33,8 @@ async updateProfile(profileData) {
             body: profileData, // FormData object
         });
 
+        console.log(response)
+
         if (!response.ok) {
             throw new Error(`Failed to update profile: ${await response.text()}`);
         }
