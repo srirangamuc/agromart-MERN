@@ -135,9 +135,9 @@ const accessLogStream = {
 };
 
 // Basic middleware
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ limit : '10mb' , extended: true }));
 
-app.use(express.json())
+app.use(express.json()({ limit: '10mb' })); // Limit request body size to 10MB
 app.use('/api/vendor', vendorRoutes);
 app.use('/api/customer', customerRoutes);
 app.use('/api/admin', adminRoutes);
