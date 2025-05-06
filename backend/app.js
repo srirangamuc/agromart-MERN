@@ -298,7 +298,15 @@ app.use(express.static("public"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Request parsers
-app.use(express.json({ limit: "10mb" }));
+app.use((req, res, next) => {
+  const contentType = req.headers['content-type'] || '';
+
+  if (contentType.includes('application/json')) {
+    express.json({ limit: '10mb' })(req, res, next);
+  } else {
+    next(); // skip JSON parser for form-data
+  }
+});
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 
