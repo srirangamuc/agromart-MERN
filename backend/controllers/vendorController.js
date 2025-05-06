@@ -339,8 +339,17 @@ class VendorController {
             quantity = parseInt(quantity, 10);
             pricePerKg = parseFloat(pricePerKg);
 
+            const MIN_PRICE = 10;
+            const MAX_PRICE = 500;
+
             if (!name || isNaN(quantity) || isNaN(pricePerKg) || !vendorId) {
                 return res.status(400).json({ error: 'All fields are required and must be valid numbers. Vendor must be logged in.' });
+            }
+            
+            if(pricePerKg < MIN_PRICE || pricePerKg > MAX_PRICE){
+                return res.status(400).json({
+                    error: `Price per kg must be between ₹${MIN_PRICE} and ₹${MAX_PRICE}.`
+                })
             }
 
             name = this.capitalizeFirstLetter(name);
