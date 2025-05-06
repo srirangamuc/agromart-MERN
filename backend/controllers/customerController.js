@@ -1029,6 +1029,7 @@ class CustomerController {
     async getCart(req, res) {
         try {
             const userId = req.user?.id;
+            console.log(userId);
             if (!userId) {
                 return res.status(401).json({ error: 'User not authenticated' });
             }
