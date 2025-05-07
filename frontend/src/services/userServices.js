@@ -25,6 +25,7 @@ export const userService = {
 
 async updateProfile(profileData) {
     try {
+        console.log(profileData)
         const response = await fetch(`${BASE_URL}/update-profile`, {
             method: "POST",
             headers:getAuthHeaders(),
