@@ -104,6 +104,8 @@ const ProfilePage = () => {
 
     const handleProfilePictureUpdate = async (e) => {
         e.preventDefault();
+        
+        console.log('📸 Selected file:', formData.profilePicture);
 
         const pictureData = new FormData();
         pictureData.append('profilePicture', formData.profilePicture);
