@@ -268,6 +268,8 @@ const adminRoutes = require("./routes/adminRoutes");
 const distributorRoutes = require("./routes/distributorRoutes");
 const customerController = require('./controllers/customerController')
 const authenticateUser = require("./middleware/authMiddleware")
+const upload = require('../multer-cloudinary'); // Import Multer middleware
+
 
 const app = express();
 
