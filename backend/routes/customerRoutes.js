@@ -34,11 +34,15 @@ router.post('/checkout',authenticateUser, (req, res) => customerController.check
 router.get('/profile',authenticateUser, (req, res) => customerController.getProfile(req, res));
 
 // ⛔ If using Express Router:
-router.post(
-    '/update-profile',authenticateUser,
-    upload.single('profilePicture'), // <-- call it directly
-    (req,res) => customerController.updateProfile
-  );
+// router.post(
+//     '/update-profile',authenticateUser,
+//     upload.single('profilePicture'), // <-- call it directly
+//     (req,res) => customerController.updateProfile
+//   );
+
+router.post('/update-profile', authenticateUser, userController.updateProfile);
+router.post('/update-profile-picture', authenticateUser, upload.single('profilePicture'), userController.updateProfilePicture);
+
 // Purchases
 router.get('/purchases',authenticateUser, (req, res) => customerController.getPurchases(req, res));
 

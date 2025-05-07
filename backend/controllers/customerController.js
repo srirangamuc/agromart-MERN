@@ -1444,9 +1444,6 @@ await purchase.save();
             console.log("📩 Received update-profile request");
     
             const customerId = req.user?.id;
-            // const customerId = req.user?._id || req.user?.id;
-
-            console.log("Session userId:", customerId);
             if (!customerId) {
                 return res.status(401).json({ error: "Unauthorized - User ID not found in session" });
             }
@@ -1455,8 +1452,6 @@ await purchase.save();
             if (!customer) {
                 return res.status(404).json({ error: "Customer not found" });
             }
-    
-            // console.log("📝 Raw Request Body:", req.body);
     
             // Extract form data
             const { name, email, hno, street, city, state, zipCode, country } = req.body;
@@ -1492,9 +1487,63 @@ await purchase.save();
     
         } catch (error) {
             console.error("❌ Error updating profile:", error);
-            res.status(500).json({ error: "Failed to update profile" ,"details":error.message});
+            res.status(500).json({ error: "Failed to update profile", details: error.message });
         }
     }
+    
+    async updateProfilePicture(req, res) {
+        try {
+            console.log("📩 Received update-profile-picture request");
+    
+            const customerId = req.user?.id;
+            if (!customerId) {
+                return res.status(401).json({ error: "Unauthorized - User ID not found in session" });
+            }
+    
+            const customer = await User.findById(customerId);
+            if (!customer) {
+                return res.status(404).json({ error: "Customer not found" });
+            }
+    
+            // Check if file is uploaded
+            if (req.file) {
+                console.log("✅ File uploaded to Cloudinary:", req.file);
+    
+                const allowedTypes = ["image/png", "image/jpg", "image/jpeg", "image/webp"];
+                if (!allowedTypes.includes(req.file.mimetype)) {
+                    return res.status(400).json({ error: "Invalid file type. Only PNG, JPG, JPEG, and WEBP are allowed." });
+                }
+    
+                // Use .path (Cloudinary gives the full URL in .path)
+                if (req.file.path) {
+                    customer.profilePicture = req.file.path;
+                } else {
+                    return res.status(500).json({ error: "Image upload failed: No Cloudinary URL found." });
+                }
+            } else {
+                return res.status(400).json({ error: "No profile picture provided." });
+            }
+    
+            // Save updated customer data
+            await customer.save();
+    
+            res.status(200).json({
+                success: true,
+                message: "Profile picture updated successfully",
+                user: {
+                    name: customer.name,
+                    email: customer.email,
+                    address: customer.address,
+                    profilePicture: customer.profilePicture,
+                }
+            });
+    
+        } catch (error) {
+            console.error("❌ Error updating profile picture:", error);
+            res.status(500).json({ error: "Failed to update profile picture", details: error.message });
+        }
+    }
+    
     
     
     

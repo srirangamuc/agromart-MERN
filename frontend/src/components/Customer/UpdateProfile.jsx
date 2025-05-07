@@ -59,25 +59,45 @@ const ProfilePage = () => {
     };
 
     // updated handle submit method .
-    const handleSubmit = async (e) => {
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    
+    //     console.log("📤 FormData before sending:", formData);
+    
+    //     const formDataToSend = new FormData();
+    
+    //     // Append all fields, even if they are empty
+    //     Object.entries(formData).forEach(([key, value]) => {
+    //         formDataToSend.append(key, value || ""); // ✅ Ensures empty fields are sent
+    //     });
+    
+    //     // Debugging: Check FormData content
+    //     for (const pair of formDataToSend.entries()) {
+    //         console.log(pair[0], pair[1]); // This should log each field properly
+    //     }
+    
+    //     try {
+    //         const updatedProfile = await userService.updateProfile(formDataToSend);
+    //         setSuccess(updatedProfile.success);
+    //         setError(null);
+    //         setUserProfile({ ...userProfile, ...updatedProfile.user });
+    //         setIsEditing(false);
+    //     } catch (error) {
+    //         setError(error.message);
+    //         setSuccess(null);
+    //     }
+    // };
+
+    const handleProfileUpdate = async (e) => {
         e.preventDefault();
-    
-        console.log("📤 FormData before sending:", formData);
-    
-        const formDataToSend = new FormData();
-    
-        // Append all fields, even if they are empty
+
+        const updatedData = new FormData();
         Object.entries(formData).forEach(([key, value]) => {
-            formDataToSend.append(key, value || ""); // ✅ Ensures empty fields are sent
+            updatedData.append(key, value || "");
         });
-    
-        // Debugging: Check FormData content
-        for (const pair of formDataToSend.entries()) {
-            console.log(pair[0], pair[1]); // This should log each field properly
-        }
-    
+
         try {
-            const updatedProfile = await userService.updateProfile(formDataToSend);
+            const updatedProfile = await userService.updateProfile(updatedData);
             setSuccess(updatedProfile.success);
             setError(null);
             setUserProfile({ ...userProfile, ...updatedProfile.user });
@@ -87,7 +107,32 @@ const ProfilePage = () => {
             setSuccess(null);
         }
     };
-    
+
+    const handleProfilePictureUpdate = async (e) => {
+        e.preventDefault();
+
+        const pictureData = new FormData();
+        pictureData.append('profilePicture', formData.profilePicture);
+
+        try {
+            const updatedProfilePic = await userService.updateProfilePicture(pictureData);
+            setSuccess(updatedProfilePic.success);
+            setError(null);
+            setUserProfile({ ...userProfile, profilePicture: updatedProfilePic.user.profilePicture });
+        } catch (error) {
+            setError(error.message);
+            setSuccess(null);
+        }
+    };
+
+    const handleProfilePicChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFormData({ ...formData, profilePicture: file });
+            const fileURL = URL.createObjectURL(file);
+            setProfilePicPreview(fileURL);
+        }
+    };
     
     
 
@@ -151,11 +196,7 @@ const ProfilePage = () => {
                                     type="file" 
                                     name="profilePicture" 
                                     accept="image/*"
-                                    onChange={(e) => {
-                                        if (e.target.files.length > 0) {
-                                            setFormData({ ...formData, profilePicture: e.target.files[0] });
-                                        }
-                                    }}
+                                    onChange={handleProfilePicChange}
                                     className="hidden"
                                     id="fileUpload"
                                 />
@@ -173,7 +214,7 @@ const ProfilePage = () => {
                     </div>
 
                 {/* Profile Form */}
-                <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                <form onSubmit={handleProfileUpdate} className="p-8 space-y-6">
                     {/* Personal Information */}
                     <div>
                         <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
@@ -361,6 +402,19 @@ const ProfilePage = () => {
                         </div>
                     )}
                 </form>
+                {/* Profile Picture Update Form */}
+                {isEditing && formData.profilePicture && (
+                    <div>
+                        <form onSubmit={handleProfilePictureUpdate}>
+                            <button 
+                                type="submit"
+                                className="bg-green-500 text-white py-3 rounded-lg w-full mt-4 transition-colors duration-300"
+                            >
+                                Update Profile Picture
+                            </button>
+                        </form>
+                    </div>
+                )}
             </div>
         </div>
     );

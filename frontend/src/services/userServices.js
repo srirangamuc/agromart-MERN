@@ -45,6 +45,24 @@ async updateProfile(profileData) {
     }
 },
 
+async updateProfilePicture(formData) {
+  try {
+      const response = await fetch(`${BASE_URL}/update-profile-picture`, {
+          method: 'POST',
+          headers: {Authorization:`Bearer ${localStorage.getItem('token')}`},
+          body: formData, // sending FormData for the file
+      });
+
+      if (!response.ok) {
+          throw new Error('Failed to update profile picture');
+      }
+
+      return await response.json();
+  } catch (error) {
+      console.error('Error updating profile picture:', error);
+      throw error;
+  }
+},
 
   // Handle other actions like purchasing subscriptions, etc.
   async purchaseSubscription(plan) {
