@@ -62,46 +62,45 @@ const SignupForm = () => {
 export default SignupForm;*/
 
 
+
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { registerUser } from "../../services/authServices";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify"; // Import toast
-
-// Make sure to import the CSS for react-toastify in your main app file (e.g., App.js)
-import 'react-toastify/dist/ReactToastify.css';
 
 const SignupForm = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [role, setRole] = useState("customer");
+    const [error, setError] = useState(""); // For showing backend errors
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(""); // Reset error before new attempt
 
-        // Check if password is valid
-        if (!passwordRegex.test(password)) {
-            // Show toast notification if password is invalid
-            toast.error("Password must be at least 8 characters, contain 1 uppercase letter, 1 number, and 1 special character.");
-            return; // Block the form submission
-        }
-
-        // Proceed with registration if password is valid
         const result = await registerUser(name, email, password, role, dispatch);
+
         if (result.success && result.shouldRedirect) {
-            navigate('/login');
+            navigate("/login");
+        } else if (result.message) {
+            setError(result.message); // Show backend error message
         }
     };
 
     return (
         <form onSubmit={handleSubmit} className="p-8 bg-white rounded shadow-md">
             <h1 className="text-2xl font-bold mb-4">Signup</h1>
+
+            {error && (
+                <div className="mb-4 text-red-600 font-medium">
+                    {error}
+                </div>
+            )}
+
             <input
                 type="text"
                 placeholder="Name"
@@ -118,10 +117,10 @@ const SignupForm = () => {
             />
             <input
                 type="password"
-                placeholder="Password (Min 8 chars, 1 uppercase, 1 number, 1 special)"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 mb-1 border rounded"
+                className="w-full px-4 py-2 mb-4 border rounded"
             />
             <select
                 value={role}
@@ -140,3 +139,4 @@ const SignupForm = () => {
 };
 
 export default SignupForm;
+

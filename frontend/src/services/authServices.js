@@ -40,7 +40,7 @@ export const registerUser = async (name, email, password, role, dispatch) => {
 
         const data = await response.json();
 
-        if (!response.ok) {
+        if (!response.ok) {// Show Toast on Failure
             dispatch(loginFailure({ error: data.message || 'Failed to create account' }));
             return { success: false, message: data.message };
         }
