@@ -40,8 +40,8 @@ router.get('/profile',authenticateUser, (req, res) => customerController.getProf
 //     (req,res) => customerController.updateProfile
 //   );
 
-router.post('/update-profile', authenticateUser, userController.updateProfile);
-router.post('/update-profile-picture', authenticateUser, upload.single('profilePicture'), userController.updateProfilePicture);
+router.post('/update-profile', authenticateUser, customerController.updateProfile);
+router.post('/update-profile-picture', authenticateUser, upload.single('profilePicture'), customerController.updateProfilePicture);
 
 // Purchases
 router.get('/purchases',authenticateUser, (req, res) => customerController.getPurchases(req, res));
