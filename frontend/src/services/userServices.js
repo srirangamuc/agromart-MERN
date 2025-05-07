@@ -47,20 +47,25 @@ async updateProfile(profileData) {
 
 async updateProfilePicture(formData) {
   try {
-      const response = await fetch(`${BASE_URL}/update-profile-picture`, {
-          method: 'POST',
-          headers: {Authorization:`Bearer ${localStorage.getItem('token')}`},
-          body: formData, // sending FormData for the file
-      });
+    const response = await fetch(`${BASE_URL}/update-profile-picture`, {
+      method: 'POST',
+      // ❗ Don't manually set 'Content-Type' for FormData
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: formData,
+    });
 
-      if (!response.ok) {
-          throw new Error('Failed to update profile picture');
-      }
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Server error:', errorData);
+      throw new Error('Failed to update profile picture');
+    }
 
-      return await response.json();
+    return await response.json();
   } catch (error) {
-      console.error('Error updating profile picture:', error);
-      throw error;
+    console.error('Error updating profile picture:', error);
+    throw error;
   }
 },
 
