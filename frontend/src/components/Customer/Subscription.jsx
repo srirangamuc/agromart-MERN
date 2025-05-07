@@ -215,7 +215,7 @@ const handleSubscribe = async (plan) => {
           href="/terms" 
           className="text-green-500 hover:underline"
         >
-          Terms and Conditions
+          Terms and Conditions Nandish
         </a>
         .
       </div>
