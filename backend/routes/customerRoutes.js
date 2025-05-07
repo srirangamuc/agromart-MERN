@@ -41,7 +41,13 @@ router.get('/profile',authenticateUser, (req, res) => customerController.getProf
 //   );
 
 router.post('/update-profile', authenticateUser, customerController.updateProfile);
-router.post('/update-profile-picture', authenticateUser, upload.single('profilePicture'), customerController.updateProfilePicture);
+// router.post('/update-profile-picture', authenticateUser, upload.single('profilePicture'), customerController.updateProfilePicture);
+router.post('/update-profile-picture', upload.single('profilePicture'), async (req, res) => {
+    console.log('✅ Entered update-profile-picture route');
+    console.log('🧾 req.user:', req.user); // set by your auth middleware
+    console.log('📎 req.file:', req.file); // set by multer
+    console.log('📝 req.body:', req.body);
+  });
 
 // Purchases
 router.get('/purchases',authenticateUser, (req, res) => customerController.getPurchases(req, res));
