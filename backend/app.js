@@ -279,6 +279,7 @@ dotenv.config();
 // CORS Configuration
 const allowedOrigins = [
   "https://agromart-mern-frontend.onrender.com",
+  "https://agromart-backend-kbxx.onrender.com/api-docs",
   "http://localhost:5173",
   "http://localhost/"
 ];
