@@ -746,7 +746,7 @@ class CustomerController {
             ]);
 
             const cities = topCities.map(c => c.city.toLowerCase());
-            console.log('Top 4 cities:', cities);
+            //console.log('Top 4 cities:', cities);
 
             // Step 2: Fetch available distributors for these cities
             const distributorsByCity = {};
@@ -790,7 +790,7 @@ class CustomerController {
             // Step 3: Store in Redis
             const cacheKey = 'top_cities_distributors';
             await redisClient.setEx(cacheKey, 3600, JSON.stringify(distributorsByCity)); // Cache for 1 hour
-            console.log('Cached distributors for top cities in Redis');
+            //console.log('Cached distributors for top cities in Redis');
 
             return distributorsByCity;
         } catch (error) {
@@ -827,7 +827,7 @@ class CustomerController {
             try {
                 const cacheKey = 'dashboard_items';
                 await redisClient.setEx(cacheKey, 3600, JSON.stringify(displayItems)); // Cache for 1 hour
-                console.log('Cached dashboard items in Redis');
+               // console.log('Cached dashboard items in Redis');
             } catch (redisError) {
                 console.error('Failed to cache dashboard items in Redis:', redisError.message);
             }
@@ -865,7 +865,7 @@ class CustomerController {
 
             // If cache miss or Redis error, fetch from MongoDB and cache
             if (!displayItems.length) {
-                console.log('Cache miss, fetching dashboard items from MongoDB');
+               // console.log('Cache miss, fetching dashboard items from MongoDB');
                 displayItems = await this.cacheDashboardItems();
             }
 
@@ -1101,12 +1101,12 @@ class CustomerController {
             if (cachedData) {
                 const distributorsByCity = JSON.parse(cachedData);
                 distributors = distributorsByCity[city] || [];
-                console.log(`Retrieved ${distributors.length} distributors from Redis for city: ${city}`);
+                //console.log(`Retrieved ${distributors.length} distributors from Redis for city: ${city}`);
             }
           
             // If no distributors found in cache or city not in cache, fetch from MongoDB
             if (!distributors.length) {
-                console.log('Cache miss or city not in top 4, fetching from MongoDB');
+               // console.log('Cache miss or city not in top 4, fetching from MongoDB');
                 distributors = await Distributor.aggregate([
                     { $match: { available: true } },
                     {

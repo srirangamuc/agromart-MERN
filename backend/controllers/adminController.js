@@ -382,7 +382,7 @@ class AdminController {
 
             try {
                 await redisClient.setEx('admin_dashboard', 3600, JSON.stringify(dashboardData));
-                console.log('Cached admin dashboard data in Redis');
+               // console.log('Cached admin dashboard data in Redis');
             } catch (redisError) {
                 console.error('Failed to cache admin dashboard data:', redisError.message);
             }
@@ -401,14 +401,14 @@ class AdminController {
                 const cachedData = await redisClient.get('admin_dashboard');
                 if (cachedData) {
                     dashboardData = JSON.parse(cachedData);
-                    console.log('Retrieved admin dashboard data from Redis');
+                   // console.log('Retrieved admin dashboard data from Redis');
                 }
             } catch (redisError) {
                 console.error('Redis error in getAdminDashboard:', redisError.message);
             }
 
             if (!dashboardData) {
-                console.log('Cache miss, fetching admin dashboard data from MongoDB');
+               // console.log('Cache miss, fetching admin dashboard data from MongoDB');
                 dashboardData = await this.cacheAdminDashboard();
             }
 
@@ -463,7 +463,7 @@ class AdminController {
 
             try {
                 await redisClient.setEx('ratings_data', 3600, JSON.stringify(ratingsData));
-                console.log('Cached ratings data in Redis');
+                //console.log('Cached ratings data in Redis');
             } catch (redisError) {
                 console.error('Failed to cache ratings data:', redisError.message);
             }
@@ -482,7 +482,7 @@ class AdminController {
                 const cachedData = await redisClient.get('ratings_data');
                 if (cachedData) {
                     ratingsData = JSON.parse(cachedData);
-                    console.log('Retrieved ratings data from Redis');
+                    //console.log('Retrieved ratings data from Redis');
                 }
             } catch (redisError) {
                 console.error('Redis error in getRatingsData:', redisError.message);
@@ -520,7 +520,7 @@ class AdminController {
 
             try {
                 await redisClient.setEx('rated_unrated_vendors', 3600, JSON.stringify(vendorData));
-                console.log('Cached rated and unrated vendors in Redis');
+               // console.log('Cached rated and unrated vendors in Redis');
             } catch (redisError) {
                 console.error('Failed to cache rated and unrated vendors:', redisError.message);
             }
@@ -539,14 +539,14 @@ class AdminController {
                 const cachedData = await redisClient.get('rated_unrated_vendors');
                 if (cachedData) {
                     vendorData = JSON.parse(cachedData);
-                    console.log('Retrieved rated and unrated vendors from Redis');
+                    //console.log('Retrieved rated and unrated vendors from Redis');
                 }
             } catch (redisError) {
                 console.error('Redis error in getRatedAndUnratedVendors:', redisError.message);
             }
 
             if (!vendorData) {
-                console.log('Cache miss, fetching rated and unrated vendors from MongoDB');
+                //console.log('Cache miss, fetching rated and unrated vendors from MongoDB');
                 vendorData = await this.cacheRatedAndUnratedVendors();
             }
 
@@ -594,7 +594,7 @@ class AdminController {
 
             try {
                 await redisClient.setEx('top_item_each_year', 3600, JSON.stringify(result));
-                console.log('Cached top item each year in Redis');
+               // console.log('Cached top item each year in Redis');
             } catch (redisError) {
                 console.error('Failed to cache top item each year:', redisError.message);
             }
@@ -613,14 +613,14 @@ class AdminController {
                 const cachedData = await redisClient.get('top_item_each_year');
                 if (cachedData) {
                     result = JSON.parse(cachedData);
-                    console.log('Retrieved top item each year from Redis');
+                   // console.log('Retrieved top item each year from Redis');
                 }
             } catch (redisError) {
                 console.error('Redis error in getTopItemEachYear:', redisError.message);
             }
 
             if (!result) {
-                console.log('Cache miss, fetching top item each year from MongoDB');
+                //console.log('Cache miss, fetching top item each year from MongoDB');
                 result = await this.cacheTopItemEachYear();
             }
 
@@ -676,7 +676,7 @@ class AdminController {
 
             try {
                 await redisClient.setEx('top_vendor_each_year', 3600, JSON.stringify(result));
-                console.log('Cached top vendor each year in Redis');
+               // console.log('Cached top vendor each year in Redis');
             } catch (redisError) {
                 console.error('Failed to cache top vendor each year:', redisError.message);
             }
@@ -695,14 +695,14 @@ class AdminController {
                 const cachedData = await redisClient.get('top_vendor_each_year');
                 if (cachedData) {
                     result = JSON.parse(cachedData);
-                    console.log('Retrieved top vendor each year from Redis');
+                   // console.log('Retrieved top vendor each year from Redis');
                 }
             } catch (redisError) {
                 console.error('Redis error in getTopVendorEachYear:', redisError.message);
             }
 
             if (!result) {
-                console.log('Cache miss, fetching top vendor each year from MongoDB');
+               // console.log('Cache miss, fetching top vendor each year from MongoDB');
                 result = await this.cacheTopVendorEachYear();
             }
 
@@ -729,7 +729,7 @@ class AdminController {
 
             try {
                 await redisClient.setEx('user_counts_by_city', 3600, JSON.stringify(userCounts));
-                console.log('Cached user counts by city in Redis');
+               // console.log('Cached user counts by city in Redis');
             } catch (redisError) {
                 console.error('Failed to cache user counts by city:', redisError.message);
             }
@@ -751,11 +751,11 @@ class AdminController {
                     console.log('Retrieved user counts by city from Redis');
                 }
             } catch (redisError) {
-                console.error('Redis error in getUserCountsByCity:', redisError.message);
+               // console.error('Redis error in getUserCountsByCity:', redisError.message);
             }
 
             if (!userCounts) {
-                console.log('Cache miss, fetching user counts by city from MongoDB');
+               // console.log('Cache miss, fetching user counts by city from MongoDB');
                 userCounts = await this.cacheUserCountsByCity();
             }
 
@@ -776,7 +776,7 @@ class AdminController {
 
             try {
                 await redisClient.setEx('customer_analysis', 3600, JSON.stringify(customerAnalysis));
-                console.log('Cached customer analysis in Redis');
+               // console.log('Cached customer analysis in Redis');
             } catch (redisError) {
                 console.error('Failed to cache customer analysis:', redisError.message);
             }
@@ -795,14 +795,14 @@ class AdminController {
                 const cachedData = await redisClient.get('customer_analysis');
                 if (cachedData) {
                     customerAnalysis = JSON.parse(cachedData);
-                    console.log('Retrieved customer analysis from Redis');
+                   // console.log('Retrieved customer analysis from Redis');
                 }
             } catch (redisError) {
                 console.error('Redis error in getCustomerAnalysis:', redisError.message);
             }
 
             if (!customerAnalysis) {
-                console.log('Cache miss, fetching customer analysis from MongoDB');
+                //console.log('Cache miss, fetching customer analysis from MongoDB');
                 customerAnalysis = await this.cacheCustomerAnalysis();
             }
 
@@ -839,7 +839,7 @@ class AdminController {
 
             try {
                 await redisClient.setEx('purchases_analysis', 3600, JSON.stringify(purchasesAnalysis));
-                console.log('Cached purchases analysis in Redis');
+                //console.log('Cached purchases analysis in Redis');
             } catch (redisError) {
                 console.error('Failed to cache purchases analysis:', redisError.message);
             }
@@ -858,14 +858,14 @@ class AdminController {
                 const cachedData = await redisClient.get('purchases_analysis');
                 if (cachedData) {
                     purchasesAnalysis = JSON.parse(cachedData);
-                    console.log('Retrieved purchases analysis from Redis');
+                    //console.log('Retrieved purchases analysis from Redis');
                 }
             } catch (redisError) {
                 console.error('Redis error in getPurchasesAnalysis:', redisError.message);
             }
 
             if (!purchasesAnalysis) {
-                console.log('Cache miss, fetching purchases analysis from MongoDB');
+                //console.log('Cache miss, fetching purchases analysis from MongoDB');
                 purchasesAnalysis = await this.cachePurchasesAnalysis();
             }
 

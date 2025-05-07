@@ -5,7 +5,7 @@ const  AdminController=require('./controllers/adminController')
 function scheduleCacheUpdates() {
     // Run every hour
     cron.schedule('* * * * *', async () => {
-        console.log('Running cache update for top cities distributors');
+        //console.log('Running cache update for top cities distributors');
         try {
             await CustomerController.cacheTopCitiesDistributors();
             await CustomerController.cacheDashboardItems();
