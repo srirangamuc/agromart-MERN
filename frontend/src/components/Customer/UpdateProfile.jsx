@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
-    User, 
-    Mail, 
+    User,  
     Lock, 
     MapPin, 
     Pencil 
@@ -91,14 +90,8 @@ const ProfilePage = () => {
 
     const handleProfileUpdate = async (e) => {
         e.preventDefault();
-
-        const updatedData = new FormData();
-        Object.entries(formData).forEach(([key, value]) => {
-            updatedData.append(key, value || "");
-        });
-
         try {
-            const updatedProfile = await userService.updateProfile(updatedData);
+            const updatedProfile = await userService.updateProfile(formData);
             setSuccess(updatedProfile.success);
             setError(null);
             setUserProfile({ ...userProfile, ...updatedProfile.user });
