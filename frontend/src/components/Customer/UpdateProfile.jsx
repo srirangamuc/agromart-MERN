@@ -178,7 +178,7 @@ const ProfilePage = () => {
                         {userProfile.profilePicture && (
                             <div className="flex justify-center mb-4">
                                 <img 
-                                    src={`https://agromart-backend-kbxx.onrender.com${userProfile.profilePicture}`} 
+                                    src={`https://agromart-backend-kbxx.onrender.com/${userProfile.profilePicture}`} 
                                     alt="Profile"
                                     className="w-40 h-40 object-cover rounded-full border-4 border-green-300 shadow-md"
                                 />
