@@ -266,6 +266,8 @@ const vendorRoutes = require("./routes/vendorRoutes");
 const customerRoutes = require("./routes/customerRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const distributorRoutes = require("./routes/distributorRoutes");
+const customerController = require('./controllers/customerController')
+const authenticateUser = require("./middleware/authMiddleware")
 
 const app = express();
 
@@ -296,6 +298,9 @@ app.use(
 // Serve static files
 app.use(express.static("public"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+
+app.post('/api/customer/update-profile-picture',authenticateUser,upload.single('profilePicture'), customerController.updateProfilePicture);
 
 // Request parsers
 app.use((req, res, next) => {
