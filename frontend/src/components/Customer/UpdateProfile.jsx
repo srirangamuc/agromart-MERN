@@ -25,6 +25,7 @@ const ProfilePage = () => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [profilePicPreview, setProfilePicPreview] = useState(null);
 
     useEffect(() => {
         const fetchProfileData = async () => {
