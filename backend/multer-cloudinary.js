@@ -2,7 +2,7 @@ const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('./cloudinary');
 
-console.log("⛅ Cloudinary config:", cloudinary.config()); // Log it
+//console.log("⛅ Cloudinary config:", cloudinary.config()); // Log it
 
 const storage = new CloudinaryStorage({
   cloudinary,
