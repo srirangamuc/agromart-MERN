@@ -13,8 +13,17 @@ const verifyCloudinaryConnection = async () => {
     console.log(`✅ Cloudinary connection successful: ${result.status}`);
     return true;
   } catch (error) {
-    console.error('❌ Cloudinary connection failed:', error.message);
-    
+    console.error('❌ Cloudinary connection failed:');
+    console.error(error);  // Log the entire error object for full details
+
+    if (error.http_code) {
+      console.error(`❌ HTTP Code: ${error.http_code}`);
+    }
+
+    if (error.message) {
+      console.error(`❌ Error Message: ${error.message}`);
+    }
+
     if (error.http_code === 401) {
       console.error('❌ Authentication failed. Please check your Cloudinary credentials.');
       console.error('Make sure your .env file contains correct values for:');
@@ -22,6 +31,7 @@ const verifyCloudinaryConnection = async () => {
       console.error('   - CLOUDINARY_API_KEY');
       console.error('   - CLOUDINARY_API_SECRET');
     }
+
     return false;
   }
 };
