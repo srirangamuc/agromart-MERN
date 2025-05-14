@@ -23,7 +23,7 @@ const HeroSection = () => {
         >
           <div className="space-y-4">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-green-900 leading-tight">
-              Fresh Nandish, 
+              Fresh Mart, 
               <br className="hidden md:block" />
               Straight from Farm
             </h1>
